@@ -16,6 +16,6 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Meteociel</string>
-    <string name="photos_list_activity">Xml Photos Adapter</string>
-    <string name="no_photos">Loading photos...</string>    
+    <string name="photos_list_activity">Liste des observations</string>
+    <string name="no_photos">Chargement...</string>    
 </resources>
