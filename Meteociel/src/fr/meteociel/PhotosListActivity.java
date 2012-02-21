@@ -19,8 +19,6 @@ package fr.meteociel;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -29,12 +27,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.ccil.cowan.tagsoup.Parser;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -108,57 +107,14 @@ public class PhotosListActivity extends ListActivity {
 		}
       	
                       
-        org.jdom.Document document = null ;
-        try {
-            /* On crée une instance de SAXBuilder */
-            SAXBuilder sxb = new SAXBuilder();
-            document = sxb.build(result.getNode().getTextContent());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (JDOMException e){
-        	throw new RuntimeException(e);
-        }
+        XPathFactory xpf = XPathFactory.newInstance();
+        XPath xpath = xpf.newXPath();
         
         try {
-            /* On initialise un nouvel élément avec l'élément racine du
-               document. */
-            Element racine = document.getRootElement();
-            
-            /* On va dans un premier temps rechercher l'ensemble des noms 
-               des patients de notre hôpital. */
-            
-            /* Recherche de la liste des patients         */
-            XPath xpa = XPath.newInstance("//patient");   
-            
-            /* On récupère tous les noeuds répondant au chemin //patient */
-            List results = xpa.selectNodes(racine) ;
-            
-            Iterator iter = results.iterator() ;
-            
-            Element noeudCourant = null;
-            String personneId = null ;
-            while (iter.hasNext()){
-                /* Pour chaque patient nous allons chercher son nom puis l'afficher */
-                noeudCourant = (Element) iter.next();
-                
-                /* On récupère l'identifiant de la personne                
-                   Noter le . en début du chemin : on part de la position courante 
-                   le @ indique que l'on cherche un attribut               */
-                xpa = XPath.newInstance("./@personneId");
-                personneId = xpa.valueOf(noeudCourant);
-                
-                /* A partir de là on récupère les infos dans la balise personne correspondante 
-                   On spécifie que l'on recherche une balise en fonction de la valeur 
-                   d'un de ses attributs :*/
-                xpa = XPath.newInstance("//personne[@id='" + personneId + "']");
-                noeudCourant = (Element) xpa.selectSingleNode(noeudCourant);
-                
-                /* Nous cherchons à présent la valeur de la balise nom :                */
-                xpa = XPath.newInstance("./nom");                
-            }
-        } catch (JDOMException e) {
-            throw new RuntimeException(e);            
-        } 
+			xpath.evaluate("//img", result.getNode(), XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException(e);
+		}
         
         
         setContentView(R.layout.photos_list);
