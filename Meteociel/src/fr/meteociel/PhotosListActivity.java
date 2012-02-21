@@ -19,7 +19,9 @@ package fr.meteociel;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 
+import javax.xml.crypto.NodeSetData;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -33,6 +35,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.ccil.cowan.tagsoup.Parser;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXNotRecognizedException;
@@ -51,15 +54,13 @@ public class PhotosListActivity extends ListActivity {
     private static final String METEOCIEL_FEED_URL =
         "http://meteociel.fr/user/day-gallery.php";
 
-   
+ 
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        System.setProperty("http.proxyHost", "80.78.6.10");
-        System.setProperty("http.proxyPort", "8080");
-        
+  
         try {
 			Thread.sleep(3);
 		} catch (InterruptedException e1) {
@@ -111,7 +112,11 @@ public class PhotosListActivity extends ListActivity {
         XPath xpath = xpf.newXPath();
         
         try {
-			xpath.evaluate("//img", result.getNode(), XPathConstants.NODESET);
+			NodeList nodeList = (NodeList) xpath.evaluate("//img", result.getNode(), XPathConstants.NODESET);
+			for(int i=0; i < nodeList.getLength(); i++){
+				Node node = nodeList.item(i);
+				node.getAttributes();
+			}
 		} catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		}

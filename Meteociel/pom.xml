@@ -19,7 +19,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<groupId>org.ccil.cowan.tagsoup</groupId>
 			<artifactId>tagsoup</artifactId>
 			<version>1.2.1</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>jdom</groupId>
 			<artifactId>jdom</artifactId>
@@ -35,6 +35,9 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 				<artifactId>android-maven-plugin</artifactId>
 				<version>3.1.1</version>
 				<configuration>
+					<run>
+						<debug>true</debug>
+					</run>
 					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
 					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
 					<resourceDirectory>${project.basedir}/res</resourceDirectory>
@@ -88,7 +91,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 										<artifactId>build-helper-maven-plugin</artifactId>
 										<versionRange>[1.0,)</versionRange>
 										<goals>
-											<goal>add-source</goal>											
+											<goal>add-source</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
@@ -102,7 +105,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 										<versionRange>[1.0,)</versionRange>
 										<goals>
 											<goal>testResources</goal>
-											<goal>resources</goal>											
+											<goal>resources</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
