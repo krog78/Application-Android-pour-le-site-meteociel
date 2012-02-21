@@ -15,11 +15,16 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			<version>2.3.3</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency>
+		<dependency>
 			<groupId>org.ccil.cowan.tagsoup</groupId>
 			<artifactId>tagsoup</artifactId>
 			<version>1.2.1</version>
-		</dependency-->
+		</dependency>		
+		<dependency>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -152,6 +157,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.7</version>
 						<executions>
 							<execution>
 								<id>add-source</id>
