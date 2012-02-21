@@ -30,10 +30,13 @@ public class PhotosListActivity extends ListActivity {
     private static final String METEOCIEL_FEED_URL =
         "http://picasaweb.google.com/data/feed/api/featured?max-results=50&thumbsize=144c";
 
+   
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        System.setProperty("http.proxyHost", "80.78.6.10");
+        System.setProperty("http.proxyPort", "8080");
         setContentView(R.layout.photos_list);
         setListAdapter(Adapters.loadCursorAdapter(this, R.xml.photos,
                 "content://xmldocument/?url=" + Uri.encode(METEOCIEL_FEED_URL)));
