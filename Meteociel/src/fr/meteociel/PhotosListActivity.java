@@ -67,8 +67,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		System.setProperty("http.proxyHost", "80.78.6.10");
-		System.setProperty("http.proxyPort", "8080");
+		//System.setProperty("http.proxyHost", "80.78.6.10");
+		//System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -131,14 +131,23 @@ public class PhotosListActivity extends Activity {
 					// Récupération du commentaire
 					Node nodeCom = nodeMap.getNamedItem("onmouseover");
 					String commentaire = nodeCom.getNodeValue();
+					String date = commentaire.substring(
+							commentaire.indexOf("('")+2,
+							commentaire.indexOf("',"));
 					String[] tokens = commentaire.split(",'");
-					String strFormat = tokens[1].substring(0, tokens[1].length()-1);
-					
-					String titre = strFormat.substring(0, strFormat.indexOf("<hr>"));
-					String user = strFormat.substring(strFormat.indexOf("<hr>"), strFormat.indexOf("<br>"));
-					String corps = strFormat.substring(strFormat.indexOf("<br>"), strFormat.length());
-					
-					strFormat = titre + "<br/>"+user+"<br/>"+corps;
+					String strFormat = tokens[1].substring(0,
+							tokens[1].length() - 1);
+
+					String titre = strFormat.substring(0,
+							strFormat.indexOf("<hr>"));
+					String user = strFormat.substring(
+							strFormat.indexOf("<hr>"),
+							strFormat.indexOf("<br>"));
+					String corps = strFormat.substring(
+							strFormat.indexOf("<br>"), strFormat.length());
+
+					strFormat = titre + " - " + date + "<br/>" + user + "<br/>"
+							+ corps;
 					// Suppression du dernier quote
 					CharSequence styledText = Html.fromHtml(strFormat);
 
@@ -173,7 +182,7 @@ public class PhotosListActivity extends Activity {
 	public OnClickListener listener = new OnClickListener() {
 		@Override
 		public void onClick(View arg0) {
-			//adapter.imageLoader.clearCache();
+			// adapter.imageLoader.clearCache();
 			adapter.notifyDataSetChanged();
 		}
 	};
