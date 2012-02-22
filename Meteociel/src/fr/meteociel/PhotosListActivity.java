@@ -67,8 +67,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		//System.setProperty("http.proxyHost", "80.78.6.10");
-		//System.setProperty("http.proxyPort", "8080");
+		System.setProperty("http.proxyHost", "80.78.6.10");
+		System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -146,7 +146,7 @@ public class PhotosListActivity extends Activity {
 					String corps = strFormat.substring(
 							strFormat.indexOf("<br>"), strFormat.length());
 
-					strFormat = titre + " - " + date + "<br/>" + user + "<br/>"
+					strFormat = titre + " - " + date + " - " + user + "<br/>"
 							+ corps;
 					// Suppression du dernier quote
 					CharSequence styledText = Html.fromHtml(strFormat);

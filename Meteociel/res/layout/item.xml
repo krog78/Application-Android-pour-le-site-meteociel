@@ -3,17 +3,12 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/image"
         android:layout_width="50dip"
-        android:layout_height="fill_parent" >
-
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="50dip"
-            android:layout_height="50dip"          
-            android:scaleType="centerCrop"
-            android:src="@drawable/stub" />
-    </RelativeLayout>
+        android:layout_height="50dip"
+        android:scaleType="centerCrop"
+        android:src="@drawable/stub" />
 
     <TextView
         android:id="@+id/text"
