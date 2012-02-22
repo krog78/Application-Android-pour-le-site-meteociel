@@ -19,9 +19,9 @@ package fr.meteociel;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.xml.crypto.NodeSetData;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -34,7 +34,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.ccil.cowan.tagsoup.Parser;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -42,53 +44,55 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
-import android.app.ListActivity;
-import android.net.Uri;
+import android.app.Activity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.TextUtils;
+import android.util.Xml;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ListView;
+import fr.meteociel.om.Observation;
 
 /**
- * This activity uses a custom cursor adapter which fetches a XML photo feed and parses the XML to
- * extract the images' URL and their title.
+ * This activity uses a custom cursor adapter which fetches a XML photo feed and
+ * parses the XML to extract the images' URL and their title.
  */
-public class PhotosListActivity extends ListActivity {
-    private static final String METEOCIEL_FEED_URL =
-        "http://meteociel.fr/user/day-gallery.php";
+public class PhotosListActivity extends Activity {
+	private static final String METEOCIEL_FEED_URL = "http://meteociel.fr/user/day-gallery.php";
 
- 
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-  
-        try {
-			Thread.sleep(3);
-		} catch (InterruptedException e1) {
-			throw new RuntimeException(e1);
-		}
-        URL url = null;
-        try {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+
+		//System.setProperty("http.proxyHost", "80.78.6.10");
+		//System.setProperty("http.proxyPort", "8080");
+
+		URL url = null;
+		try {
 			url = new URL(METEOCIEL_FEED_URL);
 		} catch (MalformedURLException e1) {
 			throw new RuntimeException(e1);
 		}
-        XMLReader reader = new Parser();
-        try {
+		XMLReader reader = new Parser();
+		try {
 			reader.setFeature(Parser.namespacesFeature, false);
 		} catch (SAXNotRecognizedException e1) {
 			throw new RuntimeException(e1);
 		} catch (SAXNotSupportedException e1) {
 			throw new RuntimeException(e1);
 		}
-        try {
+		try {
 			reader.setFeature(Parser.namespacePrefixesFeature, false);
 		} catch (SAXNotRecognizedException e1) {
 			throw new RuntimeException(e1);
 		} catch (SAXNotSupportedException e1) {
 			throw new RuntimeException(e1);
 		}
-                
-        Transformer transformer;
+
+		Transformer transformer;
 		try {
 			transformer = TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e1) {
@@ -96,34 +100,77 @@ public class PhotosListActivity extends ListActivity {
 		} catch (TransformerFactoryConfigurationError e1) {
 			throw new RuntimeException(e1);
 		}
-		
-        DOMResult result = new DOMResult();
-        try {
-			transformer.transform(new SAXSource(reader, new InputSource(url.openStream())), 
-			                      result);
+
+		DOMResult result = new DOMResult();
+		try {
+			transformer.transform(
+					new SAXSource(reader, new InputSource(url.openStream())),
+					result);
 		} catch (TransformerException e1) {
 			throw new RuntimeException(e1);
 		} catch (IOException e1) {
 			throw new RuntimeException(e1);
 		}
-      	
-                      
-        XPathFactory xpf = XPathFactory.newInstance();
-        XPath xpath = xpf.newXPath();
-        
-        try {
-			NodeList nodeList = (NodeList) xpath.evaluate("//img", result.getNode(), XPathConstants.NODESET);
-			for(int i=0; i < nodeList.getLength(); i++){
+
+		XPathFactory xpf = XPathFactory.newInstance();
+		XPath xpath = xpf.newXPath();
+
+		List<Observation> listeObservations = new ArrayList<Observation>();
+		try {
+			NodeList nodeList = (NodeList) xpath.evaluate("//img",
+					result.getNode(), XPathConstants.NODESET);
+			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
-				node.getAttributes();
+				NamedNodeMap nodeMap = node.getAttributes();
+
+				// Récupération de l'url de l'image source
+				Node nodeSrc = nodeMap.getNamedItem("src");
+				String src = nodeSrc.getNodeValue();
+
+				if (src.contains("images.meteociel.fr")) {
+					// Récupération du commentaire
+					Node nodeCom = nodeMap.getNamedItem("onmouseover");
+					String commentaire = nodeCom.getNodeValue();
+					String[] tokens = commentaire.split(",'");
+
+					CharSequence styledText = Html.fromHtml(tokens[1]);
+
+					Observation o = new Observation(
+							StringEscapeUtils.unescapeHtml(styledText
+									.toString()), src);
+					listeObservations.add(o);
+
+				}
 			}
 		} catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		}
-        
-        
-        setContentView(R.layout.photos_list);
-        setListAdapter(Adapters.loadCursorAdapter(this, R.xml.photos,
-                "content://xmldocument/?url=" + Uri.encode(METEOCIEL_FEED_URL)));
-    }
+
+		list = (ListView) findViewById(R.id.list);
+		adapter = new LazyAdapter(this,
+				listeObservations.toArray(new Observation[listeObservations
+						.size()]));
+		list.setAdapter(adapter);
+
+		Button b = (Button) findViewById(R.id.button1);
+		b.setOnClickListener(listener);
+
+	}
+
+	@Override
+	public void onDestroy() {
+		list.setAdapter(null);
+		super.onDestroy();
+	}
+
+	public OnClickListener listener = new OnClickListener() {
+		@Override
+		public void onClick(View arg0) {
+			adapter.imageLoader.clearCache();
+			adapter.notifyDataSetChanged();
+		}
+	};
+	ListView list;
+	LazyAdapter adapter;
+
 }
