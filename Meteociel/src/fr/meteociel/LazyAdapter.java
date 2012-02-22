@@ -40,8 +40,10 @@ public class LazyAdapter extends BaseAdapter {
         if(convertView==null)
             vi = inflater.inflate(R.layout.item, null);
 
-        TextView text=(TextView)vi.findViewById(R.id.text);;
+        TextView titre=(TextView)vi.findViewById(R.id.titre);
+        TextView text=(TextView)vi.findViewById(R.id.text);
         ImageView image=(ImageView)vi.findViewById(R.id.image);
+        titre.setText(observations[position].getTitre());
         text.setText(observations[position].getTexte());
 		imageLoader.DisplayImage(observations[position].getUrlImage(), image);
         return vi;

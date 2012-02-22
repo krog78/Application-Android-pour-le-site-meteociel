@@ -67,8 +67,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		System.setProperty("http.proxyHost", "80.78.6.10");
-		System.setProperty("http.proxyPort", "8080");
+		// System.setProperty("http.proxyHost", "80.78.6.10");
+		// System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -132,7 +132,7 @@ public class PhotosListActivity extends Activity {
 					Node nodeCom = nodeMap.getNamedItem("onmouseover");
 					String commentaire = nodeCom.getNodeValue();
 					String date = commentaire.substring(
-							commentaire.indexOf("('")+2,
+							commentaire.indexOf("('") + 2,
 							commentaire.indexOf("',"));
 					String[] tokens = commentaire.split(",'");
 					String strFormat = tokens[1].substring(0,
@@ -146,12 +146,14 @@ public class PhotosListActivity extends Activity {
 					String corps = strFormat.substring(
 							strFormat.indexOf("<br>"), strFormat.length());
 
-					strFormat = titre + " - " + date + " - " + user + "<br/>"
-							+ corps;
-					// Suppression du dernier quote
-					CharSequence styledText = Html.fromHtml(strFormat);
+					CharSequence styledTitre = Html.fromHtml(titre + " - "
+							+ date + " - " + user);
+
+					CharSequence styledText = Html.fromHtml(corps);
 
 					Observation o = new Observation(
+							StringEscapeUtils.unescapeJavaScript(StringEscapeUtils
+									.unescapeHtml(styledTitre.toString())),
 							StringEscapeUtils.unescapeJavaScript(StringEscapeUtils
 									.unescapeHtml(styledText.toString())), src);
 					listeObservations.add(o);
