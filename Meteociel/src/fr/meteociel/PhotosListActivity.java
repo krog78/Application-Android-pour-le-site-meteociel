@@ -49,6 +49,9 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Xml;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -67,8 +70,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// System.setProperty("http.proxyHost", "80.78.6.10");
-		// System.setProperty("http.proxyPort", "8080");
+		System.setProperty("http.proxyHost", "80.78.6.10");
+		System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -170,9 +173,6 @@ public class PhotosListActivity extends Activity {
 						.size()]));
 		list.setAdapter(adapter);
 
-		Button b = (Button) findViewById(R.id.button1);
-		b.setOnClickListener(listener);
-
 	}
 
 	@Override
@@ -181,13 +181,26 @@ public class PhotosListActivity extends Activity {
 		super.onDestroy();
 	}
 
-	public OnClickListener listener = new OnClickListener() {
-		@Override
-		public void onClick(View arg0) {
-			// adapter.imageLoader.clearCache();
-			adapter.notifyDataSetChanged();
-		}
-	};
+		
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.liste_menu, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.refresh:
+	        	adapter.notifyDataSetChanged();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
 	ListView list;
 	LazyAdapter adapter;
 
