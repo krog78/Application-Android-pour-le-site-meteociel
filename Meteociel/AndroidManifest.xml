@@ -14,6 +14,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ReportObservationActivity"
+            	  android:label="@string/reporter"
+            	  android:configChanges="keyboardHidden|orientation"></activity>
 
     </application>
     

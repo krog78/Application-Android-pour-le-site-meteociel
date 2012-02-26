@@ -45,6 +45,7 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
@@ -56,6 +57,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
 
 /**
@@ -70,8 +72,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		System.setProperty("http.proxyHost", "80.78.6.10");
-		System.setProperty("http.proxyPort", "8080");
+		//System.setProperty("http.proxyHost", "80.78.6.10");
+		//System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -196,6 +198,10 @@ public class PhotosListActivity extends Activity {
 	        case R.id.refresh:
 	        	adapter.notifyDataSetChanged();
 	            return true;
+	        case R.id.report:
+	        	Intent intent = new Intent(this, ReportObservationActivity.class);
+	            this.startActivity(intent);
+	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }

@@ -1,4 +1,8 @@
-package fr.meteociel;
+package fr.meteociel.adapter;
+import fr.meteociel.ImageLoader;
+import fr.meteociel.R;
+import fr.meteociel.R.id;
+import fr.meteociel.R.layout;
 import fr.meteociel.om.Observation;
 import android.app.Activity;
 import android.content.Context;

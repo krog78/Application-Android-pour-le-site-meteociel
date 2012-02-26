@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/refresh"
-          android:icon="@drawable/refresh"
-          android:title="@string/rafraichir"
-          />    
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/refresh"
+        android:icon="@drawable/refresh"
+        android:title="@string/rafraichir"
+        />
+    <item
+        android:id="@+id/report"
+        android:icon="@drawable/report_icon"
+        android:title="@string/reporter"/>
+
 </menu>

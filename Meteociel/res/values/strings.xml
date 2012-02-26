@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">Meteociel</string>
     <string name="rafraichir">Rafraichir</string>
+    <string name="reporter">Observations</string>
+    <string name="select_image">Sélectionner une image</string>
 </resources>
