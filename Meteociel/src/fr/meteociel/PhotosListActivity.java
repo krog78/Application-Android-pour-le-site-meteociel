@@ -45,17 +45,14 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.TextUtils;
-import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
@@ -72,8 +69,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		//System.setProperty("http.proxyHost", "80.78.6.10");
-		//System.setProperty("http.proxyPort", "8080");
+		System.setProperty("http.proxyHost", "80.78.6.10");
+		System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -114,7 +111,16 @@ public class PhotosListActivity extends Activity {
 		} catch (TransformerException e1) {
 			throw new RuntimeException(e1);
 		} catch (IOException e1) {
-			throw new RuntimeException(e1);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("Veuillez activer le transfert de données.")
+					.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+				        	   PhotosListActivity.this.finish();
+				           }
+				       });				       
+			AlertDialog alert = builder.create();
+			alert.show();	
+			return;
 		}
 
 		XPathFactory xpf = XPathFactory.newInstance();
@@ -179,34 +185,35 @@ public class PhotosListActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		list.setAdapter(null);
+		if(list != null){
+			list.setAdapter(null);
+		}
 		super.onDestroy();
 	}
 
-		
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.liste_menu, menu);
-	    return true;
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.liste_menu, menu);
+		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.refresh:
-	        	adapter.notifyDataSetChanged();
-	            return true;
-	        case R.id.report:
-	        	Intent intent = new Intent(this, ReportObservationActivity.class);
-	            this.startActivity(intent);
-	        	return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.refresh:
+			adapter.notifyDataSetChanged();
+			return true;
+		case R.id.report:
+			Intent intent = new Intent(this, ReportObservationActivity.class);
+			this.startActivity(intent);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
-	
+
 	ListView list;
 	LazyAdapter adapter;
 
