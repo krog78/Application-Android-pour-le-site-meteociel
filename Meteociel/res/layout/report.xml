@@ -26,19 +26,16 @@
 
     <ImageView
         android:id="@+id/selectedImage"
-        android:contentDescription="Image selectionnee"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:contentDescription="Image selectionnee"
+        android:src="@drawable/icon" />
 
-    <TableRow android:gravity="center" >
-
-        <Spinner 
-	        android:id="@+id/selectObservation"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:drawSelectorOnTop="true"
-	        android:prompt="@string/select_observation"
-    	/>
-    </TableRow>
+    <Spinner
+        android:id="@+id/selectObservation"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:drawSelectorOnTop="true"
+        android:prompt="@string/select_observation" />
 
 </TableLayout>

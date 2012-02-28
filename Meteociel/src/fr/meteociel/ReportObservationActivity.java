@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.omg.CORBA.NO_MEMORY;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -32,6 +34,10 @@ import android.widget.TextView;
 public class ReportObservationActivity extends Activity {
 
 	private static final int SELECT_PHOTO = 100;
+	
+	private static final String DESC_OBSERVATION = "DESC_OBSERVATION";
+	
+	private static final String IMG_OBSERVATION = "IMG_OBSERVATION";
 
 	private Uri imageUri;
 
@@ -45,18 +51,18 @@ public class ReportObservationActivity extends Activity {
         HashMap<String, Object> map = new HashMap<String, Object>();
         
         
-        map.put("Name", "One");
-        map.put("Icon", R.drawable.icon);
+        map.put(DESC_OBSERVATION, "One");
+        map.put(IMG_OBSERVATION, R.drawable.icon);
         list.add(map);
 
         map = new HashMap<String, Object>();
-        map.put("Name", "Two");
-        map.put("Icon", R.drawable.icon);
+        map.put(DESC_OBSERVATION, "Two");
+        map.put(IMG_OBSERVATION, R.drawable.icon);
         list.add(map);
 
         Spinner spin = (Spinner) findViewById(R.id.selectObservation);
         SpinnerObservationAdapter adapter = new SpinnerObservationAdapter(getApplicationContext(), list,
-                R.layout.list_layout, new String[] { "Name", "Icon" },
+                R.layout.type_observation, new String[] { DESC_OBSERVATION, IMG_OBSERVATION },
                 new int[] { R.id.text, R.id.image });
 
         spin.setAdapter(adapter);
@@ -141,16 +147,19 @@ public class ReportObservationActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
 
         	if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.list_layout,
+                convertView = getLayoutInflater().inflate(R.layout.type_observation,
                         null);
             }
         	
             HashMap<String, Object> data = (HashMap<String, Object>) getItem(position);
 
+            String texteObservation = (String)data.get(DESC_OBSERVATION);
+            int imgId = (Integer)data.get(IMG_OBSERVATION);
+            
             ((TextView) convertView.findViewById(R.id.text))
-                    .setText("toto");
+                    .setText(texteObservation);
             ((ImageView) convertView.findViewById(R.id.image))
-                    .setImageResource(R.drawable.icon);
+                    .setImageResource(imgId);
 
             return convertView;
         }
