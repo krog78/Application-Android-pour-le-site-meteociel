@@ -17,6 +17,7 @@
 package fr.meteociel;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -69,8 +70,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		//System.setProperty("http.proxyHost", "80.78.6.10");
-		//System.setProperty("http.proxyPort", "8080");
+		// System.setProperty("http.proxyHost", "80.78.6.10");
+		// System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {
@@ -104,24 +105,33 @@ public class PhotosListActivity extends Activity {
 		}
 
 		DOMResult result = new DOMResult();
+
 		try {
-			transformer.transform(
-					new SAXSource(reader, new InputSource(url.openStream())),
-					result);
-		} catch (TransformerException e1) {
-			throw new RuntimeException(e1);
+			InputStream is = url.openStream();
+			try {
+				transformer.transform(new SAXSource(reader, new InputSource(is)),
+						result);
+			} catch (TransformerException e1) {
+				throw new RuntimeException(e1);
+			}
+
 		} catch (IOException e1) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Veuillez activer le transfert de données.")
-					.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				           public void onClick(DialogInterface dialog, int id) {
-				        	   PhotosListActivity.this.finish();
-				           }
-				       });				       
+					.setCancelable(false)
+					.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									PhotosListActivity.this.finish();
+								}
+							});
 			AlertDialog alert = builder.create();
-			alert.show();	
+			alert.show();
 			return;
 		}
+
+		
 
 		XPathFactory xpf = XPathFactory.newInstance();
 		XPath xpath = xpf.newXPath();
@@ -185,7 +195,7 @@ public class PhotosListActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		if(list != null){
+		if (list != null) {
 			list.setAdapter(null);
 		}
 		super.onDestroy();

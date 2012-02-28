@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.omg.CORBA.NO_MEMORY;
 
+import fr.meteociel.util.ObservationsEnum;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -51,13 +53,13 @@ public class ReportObservationActivity extends Activity {
         HashMap<String, Object> map = new HashMap<String, Object>();
         
         
-        map.put(DESC_OBSERVATION, "One");
-        map.put(IMG_OBSERVATION, R.drawable.icon);
+        map.put(DESC_OBSERVATION, ObservationsEnum.ENSOLEILLE.text());
+        map.put(IMG_OBSERVATION, ObservationsEnum.ENSOLEILLE.image());
         list.add(map);
 
         map = new HashMap<String, Object>();
-        map.put(DESC_OBSERVATION, "Two");
-        map.put(IMG_OBSERVATION, R.drawable.icon);
+        map.put(DESC_OBSERVATION, ObservationsEnum.NUAGES_EPARS.text());
+        map.put(IMG_OBSERVATION, ObservationsEnum.NUAGES_EPARS.image());
         list.add(map);
 
         Spinner spin = (Spinner) findViewById(R.id.selectObservation);
