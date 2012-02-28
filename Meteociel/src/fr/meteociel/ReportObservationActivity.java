@@ -2,10 +2,15 @@ package fr.meteociel;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,10 +18,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.ExpandableListView;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SimpleExpandableListAdapter;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+/**
+ * Activité de report des observations (upload image + sélection observation)
+ * @author A512568
+ *
+ */
 public class ReportObservationActivity extends Activity {
 
 	private static final int SELECT_PHOTO = 100;
@@ -29,7 +41,25 @@ public class ReportObservationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.report);
 		
-		ExpandableListView expView = (ExpandableListView) findViewById(R.id.selectObservation);
+		ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        
+        
+        map.put("Name", "One");
+        map.put("Icon", R.drawable.icon);
+        list.add(map);
+
+        map = new HashMap<String, Object>();
+        map.put("Name", "Two");
+        map.put("Icon", R.drawable.icon);
+        list.add(map);
+
+        Spinner spin = (Spinner) findViewById(R.id.selectObservation);
+        SpinnerObservationAdapter adapter = new SpinnerObservationAdapter(getApplicationContext(), list,
+                R.layout.list_layout, new String[] { "Name", "Icon" },
+                new int[] { R.id.text, R.id.image });
+
+        spin.setAdapter(adapter);
 		
 		
 
@@ -98,5 +128,33 @@ public class ReportObservationActivity extends Activity {
 
 		}
 	}
+	
+	private class SpinnerObservationAdapter extends SimpleAdapter {
+
+        public SpinnerObservationAdapter(Context context, List<? extends Map<String, ?>> data,
+                int resource, String[] from, int[] to) {
+            super(context, data, resource, from, to);
+
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+        	if (convertView == null) {
+                convertView = getLayoutInflater().inflate(R.layout.list_layout,
+                        null);
+            }
+        	
+            HashMap<String, Object> data = (HashMap<String, Object>) getItem(position);
+
+            ((TextView) convertView.findViewById(R.id.text))
+                    .setText("toto");
+            ((ImageView) convertView.findViewById(R.id.image))
+                    .setImageResource(R.drawable.icon);
+
+            return convertView;
+        }
+
+    }
 
 }

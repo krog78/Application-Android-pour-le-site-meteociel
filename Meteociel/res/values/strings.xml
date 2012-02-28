@@ -3,5 +3,6 @@
     <string name="app_name">Meteociel</string>
     <string name="rafraichir">Rafraichir</string>
     <string name="reporter">Observations</string>
-    <string name="select_image">Sélectionnez une image à partir de votre gallerie ou en prenant une nouvelle photo.</string>    
+    <string name="select_image">Sélectionnez une image à partir de votre gallerie ou en prenant une nouvelle photo:</string>    
+    <string name="select_observation">Sélectionnez une observation:</string>
 </resources>

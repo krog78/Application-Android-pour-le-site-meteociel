@@ -1,0 +1,9 @@
+<resources>
+
+    <string-array name="observations">
+        <item>Ensoleillé</item>
+        <item>Couvert</item>
+        <item>Pluie</item>        
+    </string-array>
+    
+</resources>
