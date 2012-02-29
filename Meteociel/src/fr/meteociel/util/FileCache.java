@@ -1,4 +1,4 @@
-package fr.meteociel;
+package fr.meteociel.util;
 import java.io.File;
 import android.content.Context;
 

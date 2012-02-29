@@ -5,4 +5,7 @@
     <string name="reporter">Observations</string>
     <string name="select_image">Sélectionnez une image à partir de votre gallerie ou en prenant une nouvelle photo:</string>    
     <string name="select_observation">Sélectionnez une observation:</string>
+    <string name="texte_observation">Décrivez votre observation:</string>
+    <string name="image_selectionnee">Image sélectionnée</string>
+    <string name="soumettre_observation">Soumettre mon observation</string>
 </resources>

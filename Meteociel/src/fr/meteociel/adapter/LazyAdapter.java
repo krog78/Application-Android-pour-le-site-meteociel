@@ -1,9 +1,4 @@
 package fr.meteociel.adapter;
-import fr.meteociel.ImageLoader;
-import fr.meteociel.R;
-import fr.meteociel.R.id;
-import fr.meteociel.R.layout;
-import fr.meteociel.om.Observation;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import fr.meteociel.activity.R;
+import fr.meteociel.om.Observation;
+import fr.meteociel.util.ImageLoader;
 
 public class LazyAdapter extends BaseAdapter {
     

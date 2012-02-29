@@ -1,9 +1,16 @@
 <resources>
-	    
+
     <string-array name="observations">
         <item>Ensoleillé</item>
-        <item>Couvert</item>
-        <item>Pluie</item>        
+        <item>Nuages épars</item>
     </string-array>
-    
+    <string-array name="observations_img">
+        <item>@drawable/ensoleille</item>
+        <item>@drawable/nuages_epars</item>
+    </string-array>
+    <string-array name="observations_value">
+        <item>Soleil</item>
+        <item>Mitige</item>
+    </string-array>
+
 </resources>

@@ -1,4 +1,4 @@
-package fr.meteociel;
+package fr.meteociel.util;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.HashMap;

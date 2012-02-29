@@ -1,4 +1,4 @@
-package fr.meteociel;
+package fr.meteociel.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +19,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
+import fr.meteociel.activity.R;
 
 public class ImageLoader {
 

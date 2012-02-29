@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.meteociel;
+package fr.meteociel.activity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,8 +70,8 @@ public class PhotosListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// System.setProperty("http.proxyHost", "80.78.6.10");
-		// System.setProperty("http.proxyPort", "8080");
+		System.setProperty("http.proxyHost", "80.78.6.10");
+		System.setProperty("http.proxyPort", "8080");
 
 		URL url = null;
 		try {

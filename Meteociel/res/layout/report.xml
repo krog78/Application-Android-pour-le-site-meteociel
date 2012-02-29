@@ -1,41 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrllvwNo1"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_image" />
-
-    <TableRow
-        android:layout_width="wrap_content"
-        android:gravity="center" >
-
-        <ImageButton
-            android:layout_gravity="center_horizontal"
-            android:contentDescription="@string/reporter"
-            android:onClick="afficherGallerie"
-            android:src="@drawable/gallerie" />
-
-        <ImageButton
-            android:contentDescription="@string/reporter"
-            android:onClick="prendrePhoto"
-            android:src="@drawable/appareil_photo" />
-    </TableRow>
-
-    <ImageView
-        android:id="@+id/selectedImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Image selectionnee"
-        android:src="@drawable/icon" />
-
-    <Spinner
-        android:id="@+id/selectObservation"
+    <TableLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:drawSelectorOnTop="true"
-        android:prompt="@string/select_observation" />
+        android:layout_height="wrap_content" >
 
-</TableLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_image" />
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:gravity="center" >
+
+            <ImageButton
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="@string/reporter"
+                android:onClick="afficherGallerie"
+                android:src="@drawable/gallerie" />
+
+            <ImageButton
+                android:contentDescription="@string/reporter"
+                android:onClick="prendrePhoto"
+                android:src="@drawable/appareil_photo" />
+        </TableRow>
+
+        <ImageView
+            android:id="@+id/selectedImage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/image_selectionnee" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_observation" />
+        
+        <Spinner
+            android:id="@+id/selectObservation"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:drawSelectorOnTop="true"
+            android:prompt="@string/select_observation" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/texte_observation" />
+
+        <MultiAutoCompleteTextView
+            android:id="@+id/textObservation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/soumettreObservation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/soumettre_observation" />
+
+    </TableLayout>
+
+</ScrollView>
