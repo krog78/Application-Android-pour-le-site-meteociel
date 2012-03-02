@@ -7,11 +7,11 @@
     <TableRow>
 
         <EditText
-            android:id="@+id/editText2"
-            android:layout_width="wrap_content"
+            android:id="@+id/login"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1" 
-            android:inputType="text">
+            android:layout_weight="1"
+            android:inputType="text" >
 
             <requestFocus />
         </EditText>
@@ -20,12 +20,27 @@
     <TableRow>
 
         <EditText
-            android:id="@+id/editText1"
-            android:layout_width="wrap_content"
+            android:id="@+id/password"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="textPassword" >
         </EditText>
+    </TableRow>
+
+    <TableRow>
+
+        <Button
+            android:id="@+id/validation_login"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="@string/ok" />
+
+        <Button
+            android:id="@+id/cancel_login"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
     </TableRow>
 
 </TableLayout>

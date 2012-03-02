@@ -49,6 +49,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import fr.meteociel.om.ReportObservation;
+import fr.meteociel.util.HttpUtils;
 
 /**
  * Activité de report des observations (upload image + sélection observation)
@@ -74,17 +75,6 @@ public class ReportObservationActivity extends Activity {
 	 * Valeur météociel de l'observation
 	 */
 	private static final String VALUE_OBSERVATION = "VALUE_OBSERVATION";
-
-	/**
-	 * Timeout de soumission du formulaire à meteociel
-	 */
-	private static final int TIMEOUT_MS = 10000;
-
-	/**
-	 * Taille du buffer de récupération de la réponse après soumission du
-	 * formulaire
-	 */
-	private static final int BUFFER_SIZE = 8096;
 
 	/**
 	 * Objet stateful représentant le report d'observation
@@ -148,14 +138,9 @@ public class ReportObservationActivity extends Activity {
 
 		spin.setAdapter(adapter);
 
-
 		// Boite de dialogue login
-		Context mContext = getApplicationContext();
-		final Dialog dialog = new Dialog(this);
+		final Dialog dialog = creerDialogLogin();
 
-		dialog.setContentView(R.layout.login_dialog);
-		dialog.setTitle("Custom Dialog");
-		
 		// Gestion du bouton de soumission du formulaire
 		Button soumettre = (Button) findViewById(R.id.soumettreObservation);
 		soumettre.setOnClickListener(new OnClickListener() {
@@ -164,10 +149,10 @@ public class ReportObservationActivity extends Activity {
 			public void onClick(View v) {
 				AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.textObservation);
 				reportObservation.setTexte(actv.getText().toString());
-				
+
 				// Affichage de la boite de dialogue pour le login / pwd
 				dialog.show();
-				
+
 				soumettreFormulaireMeteociel(reportObservation);
 			}
 		});
@@ -282,58 +267,52 @@ public class ReportObservationActivity extends Activity {
 	private void soumettreFormulaireMeteociel(
 			ReportObservation reportObservation) {
 		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
-		HttpClient httpClient = new DefaultHttpClient();
+		HttpUtils.postRequest(url, new ArrayList<NameValuePair>());
+	}
 
-		// DEBUT Proxy pour chez Atos
-		HttpHost proxy = new HttpHost("80.78.6.10", 8080);
-		httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-				proxy);
-		// FIN Proxy pour chez Atos
+	/**
+	 * Création de la boite de dialog de login
+	 * 
+	 * @return la boite de dialogue
+	 */
+	private Dialog creerDialogLogin() {
+		final Dialog dialog = new Dialog(this);
 
-		HttpConnectionParams.setConnectionTimeout(httpClient.getParams(),
-				TIMEOUT_MS);
-		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
-		HttpPost httpPost = new HttpPost(url);
-		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		nameValuePairs.add(new BasicNameValuePair("name1", "value1"));
-		nameValuePairs.add(new BasicNameValuePair("name2", "value2"));
-		nameValuePairs.add(new BasicNameValuePair("name3", "value3"));
-		// etc...
-		try {
-			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		dialog.setContentView(R.layout.login_dialog);
+		dialog.setTitle(R.string.authentification);
 
-		try {
-			HttpResponse response = httpClient.execute(httpPost);
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()), BUFFER_SIZE);
-			StringBuilder htmlResponse = new StringBuilder();
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				htmlResponse.append(line);
-			}
+		// bouton ok
+		Button loginOK = (Button) dialog.findViewById(R.id.validation_login);
+		loginOK.setOnClickListener(new OnClickListener() {
 
-			htmlResponse.toString();
-
-			try {
-				File c = new File("/sdcard/test.html");
+			@Override
+			public void onClick(View v) {
+				String url = "http://meteociel.fr/connexion.php";
 				
-				BufferedWriter out = new BufferedWriter(new FileWriter(
-						c));
-				out.write(htmlResponse.toString());
-				out.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+				TextView login = (TextView) dialog.findViewById(R.id.login);
+				TextView password = (TextView) dialog.findViewById(R.id.password);
+							
+				
+				// Ajout des paramètres
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("Login", login.getText().toString()));
+				params.add(new BasicNameValuePair("Password1", password.getText().toString()));
+				
+				HttpUtils.postRequest(url, params);
 			}
+		});
 
-		} catch (ClientProtocolException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		// bouton ok
+		Button loginCancel = (Button) dialog.findViewById(R.id.cancel_login);
+		loginCancel.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				dialog.cancel();
+			}
+		});
+
+		return dialog;
 	}
 
 }

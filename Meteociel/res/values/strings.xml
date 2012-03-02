@@ -8,4 +8,7 @@
     <string name="texte_observation">Décrivez votre observation:</string>
     <string name="image_selectionnee">Image sélectionnée</string>
     <string name="soumettre_observation">Soumettre mon observation</string>
+    <string name="authentification">Veuillez vous authentifier</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>   
 </resources>
