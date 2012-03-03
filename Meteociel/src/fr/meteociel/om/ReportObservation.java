@@ -10,6 +10,16 @@ import android.net.Uri;
 public class ReportObservation {
 	
 	/**
+	 * Login utilisateur
+	 */
+	private String user;
+	
+	/**
+	 * Password utilisateur
+	 */
+	private String password;
+	
+	/**
 	 * Lieu de l'observation
 	 */
 	private String lieu = "Lieu0";
@@ -72,6 +82,22 @@ public class ReportObservation {
 
 	public void setHeure(String heure) {
 		this.heure = heure;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 	//private String image;

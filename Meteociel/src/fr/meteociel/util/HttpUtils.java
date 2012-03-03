@@ -17,6 +17,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 
@@ -39,18 +40,21 @@ public class HttpUtils {
 	private static final int BUFFER_SIZE = 8096;
 	
 	public static final void postRequest(String url, List<NameValuePair> params){
-		HttpClient httpClient = new DefaultHttpClient();
+		DefaultHttpClient httpClient = new DefaultHttpClient();
 
 		// DEBUT Proxy pour chez Atos
-		HttpHost proxy = new HttpHost("80.78.6.10", 8080);
-		httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-				proxy);
+		//HttpHost proxy = new HttpHost("80.78.6.10", 8080);
+		//httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,proxy);
 		// FIN Proxy pour chez Atos
 
 		HttpConnectionParams.setConnectionTimeout(httpClient.getParams(),
 				TIMEOUT_MS);
 		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
 		HttpPost httpPost = new HttpPost(url);
+		
+		BasicCookieStore cookieStore = new BasicCookieStore();
+		httpClient.setCookieStore(cookieStore);
+
 		
 		// etc...
 		try {

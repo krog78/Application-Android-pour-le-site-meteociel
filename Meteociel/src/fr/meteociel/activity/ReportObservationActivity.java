@@ -267,7 +267,14 @@ public class ReportObservationActivity extends Activity {
 	private void soumettreFormulaireMeteociel(
 			ReportObservation reportObservation) {
 		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
-		HttpUtils.postRequest(url, new ArrayList<NameValuePair>());
+		
+		// Ajout des paramètres
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
+		params.add(new BasicNameValuePair("password", reportObservation.getPassword()));
+		
+		
+		HttpUtils.postRequest(url, params);
 	}
 
 	/**
@@ -287,18 +294,13 @@ public class ReportObservationActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				String url = "http://meteociel.fr/connexion.php";
-				
 				TextView login = (TextView) dialog.findViewById(R.id.login);
 				TextView password = (TextView) dialog.findViewById(R.id.password);
-							
+				reportObservation.setUser(login.getText().toString());
+				reportObservation.setPassword(password.getText().toString());
 				
-				// Ajout des paramètres
-				List<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add(new BasicNameValuePair("Login", login.getText().toString()));
-				params.add(new BasicNameValuePair("Password1", password.getText().toString()));
 				
-				HttpUtils.postRequest(url, params);
+				soumettreFormulaireMeteociel(reportObservation);
 			}
 		});
 
