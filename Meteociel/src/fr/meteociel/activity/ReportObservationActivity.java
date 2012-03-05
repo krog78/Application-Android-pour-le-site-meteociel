@@ -1,31 +1,15 @@
 package fr.meteociel.activity;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpConnectionParams;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -207,6 +191,7 @@ public class ReportObservationActivity extends Activity {
 					selectedImage = reportObservation.getImageUri();
 				} else { // Ca vient de la gallerie
 					selectedImage = imageReturnedIntent.getData();
+					reportObservation.setImageUri(selectedImage);
 				}
 
 				InputStream imageStream;
@@ -280,6 +265,18 @@ public class ReportObservationActivity extends Activity {
 		
 		HttpUtils.postRequest(url, params);
 	}
+	
+	/**
+	 * Méthode permettant de soumettre une image au site Meteociel
+	 * @param reportObservation
+	 */
+	private void soumettreImageMeteociel(
+			ReportObservation reportObservation) {
+		String url = "http://images.meteociel.fr/image_envoi.php";
+		
+		// Ajout des paramètres
+		HttpUtils.UploadImageRequest(url, new ArrayList<NameValuePair>(), reportObservation.getImageUri().getPath());
+	}
 
 	/**
 	 * Création de la boite de dialog de login
@@ -304,7 +301,8 @@ public class ReportObservationActivity extends Activity {
 				reportObservation.setPassword(password.getText().toString());
 				
 				
-				soumettreFormulaireMeteociel(reportObservation);
+				//soumettreFormulaireMeteociel(reportObservation);
+				soumettreImageMeteociel(reportObservation);
 			}
 		});
 
