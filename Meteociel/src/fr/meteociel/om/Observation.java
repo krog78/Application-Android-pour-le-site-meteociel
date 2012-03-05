@@ -1,7 +1,7 @@
 package fr.meteociel.om;
 
 /**
- * Objet métier représentant une observation
+ * Objet metier representant une observation
  * 
  * @author Krog78
  * 

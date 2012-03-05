@@ -35,12 +35,12 @@ public class ReportObservation {
 	private String texte;
 	
 	/**
-	 * Valeur sélection pour météociel
+	 * Valeur selection pour meteociel
 	 */
 	private String value;
 		
 	/**
-	 * Uri de l'image sélectionnée
+	 * Uri de l'image seectionnee
 	 */
 	private Uri imageUri;
 

@@ -4,4 +4,4 @@ Commandes android:
 mvn clean install android:deploy
 
 adb shell
-# am start -a android.intent.action.MAIN -n fr.meteociel/fr.meteociel.PhotosListActivity -D
+# am start -a android.intent.action.MAIN -n fr.meteociel.activity/fr.meteociel.activity.PhotosListActivity -D

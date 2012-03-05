@@ -52,7 +52,7 @@ import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.HttpUtils;
 
 /**
- * Activité de report des observations (upload image + sélection observation)
+ * Activite de report des observations (upload image + selection observation)
  * 
  * @author A512568
  * 
@@ -72,12 +72,12 @@ public class ReportObservationActivity extends Activity {
 	private static final String IMG_OBSERVATION = "IMG_OBSERVATION";
 
 	/**
-	 * Valeur météociel de l'observation
+	 * Valeur meteociel de l'observation
 	 */
 	private static final String VALUE_OBSERVATION = "VALUE_OBSERVATION";
 
 	/**
-	 * Objet stateful représentant le report d'observation
+	 * Objet stateful representant le report d'observation
 	 */
 	private ReportObservation reportObservation = new ReportObservation();
 
@@ -88,8 +88,8 @@ public class ReportObservationActivity extends Activity {
 		setContentView(R.layout.report);
 
 		// Parcours de la liste des types d'observations et des images
-		// dans le fichier res/values/array.xml et ajout à la
-		// liste passée à l'adapter
+		// dans le fichier res/values/array.xml et ajout Ã  la
+		// liste passÃ©e Ã  l'adapter
 		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
 
 		String[] listTypeObs = getResources().getStringArray(
@@ -102,9 +102,9 @@ public class ReportObservationActivity extends Activity {
 		if (listTypeObs.length != imgs.length()
 				|| listTypeObs.length != listValueObs.length) {
 			throw new RuntimeException(
-					"Problème de configuration du fichier array.xml: "
+					"ProblÃ¨me de configuration du fichier array.xml: "
 							+ "les tailles de la liste du texte et des "
-							+ "images sont différentes.");
+							+ "images sont diffÃ©rentes.");
 		}
 
 		for (int i = 0; i < listTypeObs.length; i++) {
@@ -117,7 +117,7 @@ public class ReportObservationActivity extends Activity {
 
 		}
 
-		// Rempli la liste déroulante des types d'observations
+		// Rempli la liste dÃ©roulante des types d'observations
 		Spinner spin = (Spinner) findViewById(R.id.selectObservation);
 
 		spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -159,7 +159,7 @@ public class ReportObservationActivity extends Activity {
 	}
 
 	/**
-	 * Permet d'afficher le contenu de la gallerie d'images du téléphone
+	 * Permet d'afficher le contenu de la gallerie d'images du tÃ©lÃ©phone
 	 * 
 	 * @param v
 	 */
@@ -259,26 +259,30 @@ public class ReportObservationActivity extends Activity {
 	}
 
 	/**
-	 * Méthode permettant de soumettre un report d'observation au site meteociel
+	 * MÃ©thode permettant de soumettre un report d'observation au site meteociel
 	 * 
 	 * @param reportObservation
-	 *            le report d'observation à soumettre
+	 *            le report d'observation Ã  soumettre
 	 */
 	private void soumettreFormulaireMeteociel(
 			ReportObservation reportObservation) {
 		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
 		
-		// Ajout des paramètres
+		// Ajout des paramÃ¨tres
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
-		params.add(new BasicNameValuePair("password", reportObservation.getPassword()));
+		params.add(new BasicNameValuePair("Pass", reportObservation.getPassword()));
+		params.add(new BasicNameValuePair("heure", reportObservation.getHeure()));
+		params.add(new BasicNameValuePair("RadioGroup2", reportObservation.getLieu()));
+		params.add(new BasicNameValuePair("Commentaire", reportObservation.getTexte()));
+		params.add(new BasicNameValuePair("RadioGroup", reportObservation.getValue()));
 		
 		
 		HttpUtils.postRequest(url, params);
 	}
 
 	/**
-	 * Création de la boite de dialog de login
+	 * CrÃ©ation de la boite de dialog de login
 	 * 
 	 * @return la boite de dialogue
 	 */

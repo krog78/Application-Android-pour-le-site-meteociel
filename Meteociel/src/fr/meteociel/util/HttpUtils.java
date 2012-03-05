@@ -22,19 +22,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 
 /**
- * Classe utilitaire pour les accès Http
+ * Classe utilitaire pour les accÃ¨s Http
  * @author A512568
  *
  */
 public class HttpUtils {
 	
 	/**
-	 * Timeout de soumission du formulaire à meteociel
+	 * Timeout de soumission du formulaire Ã  meteociel
 	 */
 	private static final int TIMEOUT_MS = 10000;
 
 	/**
-	 * Taille du buffer de récupération de la réponse après soumission du
+	 * Taille du buffer de rÃ©cupÃ©ration de la rÃ©ponse aprÃ¨s soumission du
 	 * formulaire
 	 */
 	private static final int BUFFER_SIZE = 8096;

@@ -117,7 +117,7 @@ public class PhotosListActivity extends Activity {
 
 		} catch (IOException e1) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Veuillez activer le transfert de données.")
+			builder.setMessage("Veuillez activer le transfert de donnÃ©es.")
 					.setCancelable(false)
 					.setPositiveButton("OK",
 							new DialogInterface.OnClickListener() {
@@ -144,12 +144,12 @@ public class PhotosListActivity extends Activity {
 				Node node = nodeList.item(i);
 				NamedNodeMap nodeMap = node.getAttributes();
 
-				// Récupération de l'url de l'image source
+				// Rï¿½cupï¿½ration de l'url de l'image source
 				Node nodeSrc = nodeMap.getNamedItem("src");
 				String src = nodeSrc.getNodeValue();
 
 				if (src.contains("images.meteociel.fr")) {
-					// Récupération du commentaire
+					// Rï¿½cupï¿½ration du commentaire
 					Node nodeCom = nodeMap.getNamedItem("onmouseover");
 					String commentaire = nodeCom.getNodeValue();
 					String date = commentaire.substring(
