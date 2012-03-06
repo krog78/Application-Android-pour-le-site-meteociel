@@ -43,6 +43,19 @@ public class ReportObservation {
 	 * Uri de l'image seectionnee
 	 */
 	private Uri imageUri;
+	
+	/**
+	 * Path de l'image sélectionnée
+	 */
+	private String pathImage;
+
+	public String getPathImage() {
+		return pathImage;
+	}
+
+	public void setPathImage(String pathImage) {
+		this.pathImage = pathImage;
+	}
 
 	public String getTexte() {
 		return texte;

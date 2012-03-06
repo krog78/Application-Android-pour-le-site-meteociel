@@ -17,6 +17,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -169,6 +170,8 @@ public class ReportObservationActivity extends Activity {
 				"Image capture by camera");
 		reportObservation.setImageUri(getContentResolver().insert(
 				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values));
+		reportObservation
+				.setPathImage(getPath(reportObservation.getImageUri()));
 		// create new Intent
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		intent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -192,6 +195,7 @@ public class ReportObservationActivity extends Activity {
 				} else { // Ca vient de la gallerie
 					selectedImage = imageReturnedIntent.getData();
 					reportObservation.setImageUri(selectedImage);
+					reportObservation.setPathImage(getPath(selectedImage));
 				}
 
 				InputStream imageStream;
@@ -252,30 +256,52 @@ public class ReportObservationActivity extends Activity {
 	private void soumettreFormulaireMeteociel(
 			ReportObservation reportObservation) {
 		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
-		
+
 		// Ajout des paramètres
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
-		params.add(new BasicNameValuePair("Pass", reportObservation.getPassword()));
+		params.add(new BasicNameValuePair("Pass", reportObservation
+				.getPassword()));
 		params.add(new BasicNameValuePair("heure", reportObservation.getHeure()));
-		params.add(new BasicNameValuePair("RadioGroup2", reportObservation.getLieu()));
-		params.add(new BasicNameValuePair("Commentaire", reportObservation.getTexte()));
-		params.add(new BasicNameValuePair("RadioGroup", reportObservation.getValue()));
-		
-		
+		params.add(new BasicNameValuePair("RadioGroup2", reportObservation
+				.getLieu()));
+		params.add(new BasicNameValuePair("Commentaire", reportObservation
+				.getTexte()));
+		params.add(new BasicNameValuePair("RadioGroup", reportObservation
+				.getValue()));
+
 		HttpUtils.postRequest(url, params);
 	}
-	
+
 	/**
 	 * Méthode permettant de soumettre une image au site Meteociel
+	 * 
 	 * @param reportObservation
 	 */
-	private void soumettreImageMeteociel(
-			ReportObservation reportObservation) {
+	private void soumettreImageMeteociel(ReportObservation reportObservation) {
 		String url = "http://images.meteociel.fr/image_envoi.php";
-		
+
 		// Ajout des paramètres
-		HttpUtils.UploadImageRequest(url, new ArrayList<NameValuePair>(), reportObservation.getImageUri().getPath());
+		HttpUtils.uploadImageRequest(url, new ArrayList<NameValuePair>(),
+				reportObservation.getPathImage());
+	}
+
+	/**
+	 * Méthode de login au site météociel
+	 * @param reportObservation le report de l'observation
+	 */
+	private void loginMeteociel(ReportObservation reportObservation) {
+
+		String url = "http://www.meteociel.fr/connexion.php";
+
+		// Ajout des paramètres
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
+		params.add(new BasicNameValuePair("Pass", reportObservation
+				.getPassword()));
+		params.add(new BasicNameValuePair("expire", "on"));
+		
+		HttpUtils.postRequest(url, params);
 	}
 
 	/**
@@ -296,12 +322,13 @@ public class ReportObservationActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				TextView login = (TextView) dialog.findViewById(R.id.login);
-				TextView password = (TextView) dialog.findViewById(R.id.password);
+				TextView password = (TextView) dialog
+						.findViewById(R.id.password);
 				reportObservation.setUser(login.getText().toString());
 				reportObservation.setPassword(password.getText().toString());
-				
-				
-				//soumettreFormulaireMeteociel(reportObservation);
+
+				// soumettreFormulaireMeteociel(reportObservation);
+				loginMeteociel(reportObservation);
 				soumettreImageMeteociel(reportObservation);
 			}
 		});
@@ -317,6 +344,23 @@ public class ReportObservationActivity extends Activity {
 		});
 
 		return dialog;
+	}
+
+	/**
+	 * Convertit un URI en path
+	 * 
+	 * @param uri
+	 *            l'uri du fichier
+	 * @return le chemin du fichier
+	 */
+	private String getPath(Uri uri) {
+		String[] projection = { MediaStore.Images.Media.DATA };
+		Cursor cursor = managedQuery(uri, projection, null, null, null);
+		startManagingCursor(cursor);
+		int column_index = cursor
+				.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+		cursor.moveToFirst();
+		return cursor.getString(column_index);
 	}
 
 }

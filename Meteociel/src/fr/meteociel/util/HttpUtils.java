@@ -20,7 +20,10 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpConnectionParams;
+
+import android.os.Environment;
 
 /**
  * Classe utilitaire pour les accès Http
@@ -42,9 +45,30 @@ public class HttpUtils {
 	private static final int BUFFER_SIZE = 8096;
 
 	/**
+	 * Paramètre site météociel
+	 */
+	private static final int MAX_FILE_SIZE = 3170000;
+
+	/**
 	 * Contenu form-data
 	 */
 	public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+
+	/**
+	 * HttpClient utilisé par l'application
+	 */
+	private static final DefaultHttpClient httpClient = new DefaultHttpClient();
+
+	static {
+		BasicCookieStore cookieStore = new BasicCookieStore();
+		httpClient.setCookieStore(cookieStore);
+		httpClient
+				.getParams()
+				.setParameter(
+						CoreProtocolPNames.USER_AGENT,
+						"Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:10.0.2) Gecko/20100101 Firefox/10.0.2");
+
+	}
 
 	/**
 	 * Poste une requête
@@ -56,10 +80,14 @@ public class HttpUtils {
 	 * @param filePath
 	 *            chemin du fichier à uploader
 	 */
-	public static final void UploadImageRequest(String url,
+	public static final void uploadImageRequest(String url,
 			List<NameValuePair> params, String filePath) {
 
-		File file = new File(filePath);
+		// File file = new File(filePath);
+
+		File file = new File(Environment.getExternalStorageDirectory()
+				+ "/DCIM/Camera/arrow_down.png");
+
 		MultipartEntity mpEntity = new MultipartEntity();
 		ContentBody cbFile = new FileBody(file, "image/png");
 		ContentBody cbSource;
@@ -68,26 +96,80 @@ public class HttpUtils {
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
+
+		ContentBody maxFileSize;
+		try {
+			maxFileSize = new StringBody(String.valueOf(MAX_FILE_SIZE));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+
+		ContentBody dMode;
+		try {
+			dMode = new StringBody("1");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+
+		ContentBody imageUrl;
+		try {
+			imageUrl = new StringBody("");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+
+		ContentBody envoyer;
+		try {
+			envoyer = new StringBody("En cours d'envoi ...");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		mpEntity.addPart("envoyer", envoyer);
+		mpEntity.addPart("imageurl", imageUrl);
+		mpEntity.addPart("dmode", dMode);
 		mpEntity.addPart("source", cbSource);
+		mpEntity.addPart("MAX_FILE_SIZE", maxFileSize);
 		mpEntity.addPart("image", cbFile);
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(mpEntity);
 		httpPost.setHeader("Content-Type", MULTIPART_FORM_DATA);
-		httpPost.setHeader("Content-Length", String.valueOf(cbFile.getContentLength()));
 		
-		postRequest(url, params, httpPost);
-	}
+//		httpPost.setHeader("Accept-Encoding", "gzip, deflate");
+//		httpPost.setHeader("Accept",
+//				"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+//		httpPost.setHeader("Accept-Language", "en-us,en;q=0.5");
+//		httpPost.setHeader("Referer", "http://images.meteociel.fr/");
 
-	/**
-	 * Poste une requête
-	 * 
-	 * @param url
-	 *            l'url de la requête
-	 * @param params
-	 *            les paramètres à poster
-	 */
-	public static final void postRequest(String url, List<NameValuePair> params) {
-		postRequest(url, params, null);
+		HttpConnectionParams.setConnectionTimeout(httpClient.getParams(),
+				TIMEOUT_MS);
+		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
+
+		try {
+			HttpResponse response = httpClient.execute(httpPost);
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					response.getEntity().getContent()), BUFFER_SIZE);
+			StringBuilder htmlResponse = new StringBuilder();
+			String line = "";
+			while ((line = br.readLine()) != null) {
+				htmlResponse.append(line);
+			}
+
+			try {
+				File c = new File("/sdcard/test.html");
+
+				BufferedWriter out = new BufferedWriter(new FileWriter(c));
+				out.write(htmlResponse.toString());
+				out.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
+		} catch (ClientProtocolException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	/**
@@ -100,9 +182,7 @@ public class HttpUtils {
 	 * @param httpPost
 	 * 
 	 */
-	public static final void postRequest(String url,
-			List<NameValuePair> params, HttpPost httpPost) {
-		DefaultHttpClient httpClient = new DefaultHttpClient();
+	public static final void postRequest(String url, List<NameValuePair> params) {
 
 		// DEBUT Proxy pour chez Atos
 		// HttpHost proxy = new HttpHost("80.78.6.10", 8080);
@@ -113,13 +193,7 @@ public class HttpUtils {
 				TIMEOUT_MS);
 		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
 
-		if (httpPost == null) {
-			httpPost = new HttpPost(url);
-		}
-
-		BasicCookieStore cookieStore = new BasicCookieStore();
-		httpClient.setCookieStore(cookieStore);
-
+		HttpPost httpPost = new HttpPost(url);
 		// etc...
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(params));
@@ -153,4 +227,5 @@ public class HttpUtils {
 			throw new RuntimeException(e);
 		}
 	}
+
 }
