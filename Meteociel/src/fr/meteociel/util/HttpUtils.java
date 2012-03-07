@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -14,6 +15,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
@@ -22,6 +24,8 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 
 import android.os.Environment;
 
@@ -52,12 +56,27 @@ public class HttpUtils {
 	/**
 	 * Contenu form-data
 	 */
-	public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+	public static final String MULTIPART_FORM_DATA = "multipart/form-data; boundary=";
 
 	/**
 	 * HttpClient utilisé par l'application
 	 */
 	private static final DefaultHttpClient httpClient = new DefaultHttpClient();
+
+	/**
+	 * Contexte de la requête http
+	 */
+	private static final HttpContext localContext = new BasicHttpContext();
+
+	/**
+	 * Boundary délimitant les parties du multipart
+	 */
+	private static final String BOUNDARY = "--OFzbLE37uDifDeYSl6Ie7yxG431UNaDf5Uv6";
+
+	/**
+	 * Charset utilisé dans la requête HTTP
+	 */
+	private static final String CHARSET = "UTF-8";
 
 	static {
 		BasicCookieStore cookieStore = new BasicCookieStore();
@@ -83,12 +102,11 @@ public class HttpUtils {
 	public static final void uploadImageRequest(String url,
 			List<NameValuePair> params, String filePath) {
 
-		// File file = new File(filePath);
-
-		File file = new File(Environment.getExternalStorageDirectory()
-				+ "/DCIM/Camera/arrow_down.png");
-
-		MultipartEntity mpEntity = new MultipartEntity();
+		File file = new File(filePath);
+		
+		MultipartEntity mpEntity = new MultipartEntity(
+				HttpMultipartMode.BROWSER_COMPATIBLE, BOUNDARY,
+				Charset.forName(CHARSET));
 		ContentBody cbFile = new FileBody(file, "image/png");
 		ContentBody cbSource;
 		try {
@@ -132,20 +150,22 @@ public class HttpUtils {
 		mpEntity.addPart("image", cbFile);
 		HttpPost httpPost = new HttpPost(url);
 		httpPost.setEntity(mpEntity);
-		httpPost.setHeader("Content-Type", MULTIPART_FORM_DATA);
-		
-//		httpPost.setHeader("Accept-Encoding", "gzip, deflate");
-//		httpPost.setHeader("Accept",
-//				"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-//		httpPost.setHeader("Accept-Language", "en-us,en;q=0.5");
-//		httpPost.setHeader("Referer", "http://images.meteociel.fr/");
+		httpPost.setHeader("Content-Type", MULTIPART_FORM_DATA + BOUNDARY);
+
+		httpPost.setHeader("Host", "images.meteociel.fr");
+		httpPost.setHeader("Connection", "keep-alive");
+		httpPost.setHeader("Accept",
+				"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+		httpPost.setHeader("Accept-Language",
+				"fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3");
+		httpPost.setHeader("Referer", "http://images.meteociel.fr/");
 
 		HttpConnectionParams.setConnectionTimeout(httpClient.getParams(),
 				TIMEOUT_MS);
 		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
 
 		try {
-			HttpResponse response = httpClient.execute(httpPost);
+			HttpResponse response = httpClient.execute(httpPost, localContext);
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					response.getEntity().getContent()), BUFFER_SIZE);
 			StringBuilder htmlResponse = new StringBuilder();
@@ -202,7 +222,7 @@ public class HttpUtils {
 		}
 
 		try {
-			HttpResponse response = httpClient.execute(httpPost);
+			HttpResponse response = httpClient.execute(httpPost, localContext);
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					response.getEntity().getContent()), BUFFER_SIZE);
 			StringBuilder htmlResponse = new StringBuilder();

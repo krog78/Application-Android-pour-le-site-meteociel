@@ -16,6 +16,7 @@ import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -43,6 +44,21 @@ import fr.meteociel.util.HttpUtils;
  * 
  */
 public class ReportObservationActivity extends Activity {
+
+	/**
+	 * Préférences de l'appli météociel
+	 */
+	public static final String PREFS_NAME = "MeteocielPrefs";
+
+	/**
+	 * Préférence de login
+	 */
+	public static final String PREF_LOGIN = "login";
+
+	/**
+	 * Préférence de password
+	 */
+	public static final String PREF_PWD = "password";
 
 	private static final int SELECT_PHOTO = 100;
 
@@ -136,9 +152,19 @@ public class ReportObservationActivity extends Activity {
 				reportObservation.setTexte(actv.getText().toString());
 
 				// Affichage de la boite de dialogue pour le login / pwd
-				dialog.show();
+				// Si les préférences ne sont pas déjà renseignées
+				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+				String login = settings.getString(PREF_LOGIN, "");
+				String password = settings.getString(PREF_PWD, "");
 
-				soumettreFormulaireMeteociel(reportObservation);
+				if (login.isEmpty() || password.isEmpty()) {
+					dialog.show();
+				} else {
+					// FIXME à remettre
+					// soumettreFormulaireMeteociel(reportObservation);
+					finish();
+				}
+
 			}
 		});
 	}
@@ -281,14 +307,19 @@ public class ReportObservationActivity extends Activity {
 	private void soumettreImageMeteociel(ReportObservation reportObservation) {
 		String url = "http://images.meteociel.fr/image_envoi.php";
 
-		// Ajout des paramètres
-		HttpUtils.uploadImageRequest(url, new ArrayList<NameValuePair>(),
-				reportObservation.getPathImage());
+		if (!reportObservation.getPathImage().isEmpty()) {
+
+			// Ajout des paramètres
+			HttpUtils.uploadImageRequest(url, new ArrayList<NameValuePair>(),
+					reportObservation.getPathImage());
+		}
 	}
 
 	/**
 	 * Méthode de login au site météociel
-	 * @param reportObservation le report de l'observation
+	 * 
+	 * @param reportObservation
+	 *            le report de l'observation
 	 */
 	private void loginMeteociel(ReportObservation reportObservation) {
 
@@ -300,7 +331,7 @@ public class ReportObservationActivity extends Activity {
 		params.add(new BasicNameValuePair("Pass", reportObservation
 				.getPassword()));
 		params.add(new BasicNameValuePair("expire", "on"));
-		
+
 		HttpUtils.postRequest(url, params);
 	}
 
@@ -327,9 +358,20 @@ public class ReportObservationActivity extends Activity {
 				reportObservation.setUser(login.getText().toString());
 				reportObservation.setPassword(password.getText().toString());
 
-				// soumettreFormulaireMeteociel(reportObservation);
+				// Ajout dans les préférences
+				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putString(PREF_LOGIN, reportObservation.getUser());
+				editor.putString(PREF_PWD, reportObservation.getPassword());
+				// Commit the edits!
+				editor.commit();
+
 				loginMeteociel(reportObservation);
 				soumettreImageMeteociel(reportObservation);
+				// FIXME à remettre
+				// soumettreFormulaireMeteociel(reportObservation);
+
+				finish();
 			}
 		});
 
