@@ -1,16 +1,82 @@
 <resources>
 
     <string-array name="observations">
-        <item>Ensoleillé</item>
-        <item>Nuages épars</item>
+        <item>Vent en rafales</item>
+        <item>Bruine</item>
+        <item>Pluie faible</item>
+        <item>Pluie modérée/forte</item>
+        <item>Averse de pluie faible</item>
+        <item>Averse de pluie modérée/forte</item>
+        <item>Averse de grêle</item>
+        <item>Averse orageuse</item>
+        <item>Neige faible</item>
+        <item>Neige moderée/forte</item>
+        <item>Averse de neige</item>
+        <item>Pluie et neige</item>
+        <item>Grésil</item>
+        <item>Température</item>
+        <item>Brouillard</item>
+        <item>Brouillard givrant</item>
+        <item>Verglas</item>
+        <item>Foudre</item>
+        <item>Cumulonimbus</item>
+        <item>Ciel clair - Jour - Soleil</item>
+        <item>Ciel clair - Nuit - Lune</item>
+        <item>Couvert</item>
+        <item>Mitigé jour</item>
+        <item>Mitigé nuit</item>        
     </string-array>
     <string-array name="observations_img">
+        <item>@drawable/vent_rafales</item>
+        <item>@drawable/bruine</item>
+        <item>@drawable/pluie_faible</item>
+        <item>@drawable/pluie_moderee</item>
+        <item>@drawable/averse_pluie_faible</item>
+        <item>@drawable/averse_pluie_moderee</item>
+        <item>@drawable/averse_grele</item>
+        <item>@drawable/averse_orageuse</item>
+        <item>@drawable/neige_faible</item>
+        <item>@drawable/neige_moderee</item>
+        <item>@drawable/averse_neige</item>
+        <item>@drawable/pluie_neige</item>
+        <item>@drawable/gresil</item>
+        <item>@drawable/temperature</item>
+        <item>@drawable/brouillard</item>
+        <item>@drawable/brouillard_givrant</item>
+        <item>@drawable/verglas</item>
+        <item>@drawable/foudre</item>
+        <item>@drawable/cumulonimbus</item>
         <item>@drawable/ensoleille</item>
-        <item>@drawable/nuages_epars</item>
+        <item>@drawable/lune</item>
+        <item>@drawable/couvert</item>
+        <item>@drawable/mitige_jour</item>
+        <item>@drawable/mitige_nuit</item>
     </string-array>
     <string-array name="observations_value">
+        <item>Vent</item>
+        <item>Bruine</item>
+        <item>Pluie</item>
+        <item>Pluie modérée/forte</item>
+        <item>AversePluie</item>
+        <item>AversePluieForte</item>
+        <item>AverseGrele</item>
+        <item>AverseOrageuse</item>
+        <item>Neige</item>
+        <item>NeigeForte</item>
+        <item>AverseNeige</item>
+        <item>PluieNeige</item>
+        <item>Gresil</item>
+        <item>Temp</item>
+        <item>Brouillard</item>
+        <item>BrouillardGivrant</item>
+        <item>Verglas</item>
+        <item>Foudre</item>
+        <item>Cumulo</item>
         <item>Soleil</item>
+        <item>Lune</item>
+        <item>Couvert</item>
         <item>Mitige</item>
+        <item>MitigeNuit</item>
     </string-array>
 
 </resources>
