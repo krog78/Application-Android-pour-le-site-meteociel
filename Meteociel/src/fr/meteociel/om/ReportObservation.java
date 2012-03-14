@@ -27,7 +27,7 @@ public class ReportObservation {
 	/**
 	 * Heure de l'observation
 	 */
-	private String heure = "Maintenant";
+	private int heure = 0;
 	
 	/**
 	 * Texte de l'observation
@@ -89,11 +89,11 @@ public class ReportObservation {
 		this.lieu = lieu;
 	}
 
-	public String getHeure() {
+	public int getHeure() {
 		return heure;
 	}
 
-	public void setHeure(String heure) {
+	public void setHeure(int heure) {
 		this.heure = heure;
 	}
 

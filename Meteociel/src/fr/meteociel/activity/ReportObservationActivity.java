@@ -12,9 +12,11 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -24,16 +26,21 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.HttpUtils;
 
@@ -59,6 +66,8 @@ public class ReportObservationActivity extends Activity {
 	 * Préférence de password
 	 */
 	public static final String PREF_PWD = "password";
+
+	private static final String HEURE_SUFFIX = ":00";
 
 	private static final int SELECT_PHOTO = 100;
 
@@ -87,6 +96,12 @@ public class ReportObservationActivity extends Activity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.report);
+
+		// On rempli l'heure par défaut l'heure courante
+		CheckedTextView v = (CheckedTextView) findViewById(R.id.heureObservation);
+		v.setText(getString(R.string.heure_observation) + " "
+				+ Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+				+ HEURE_SUFFIX);
 
 		Intent intent = getIntent();
 		Bundle extras = intent.getExtras();
@@ -255,7 +270,8 @@ public class ReportObservationActivity extends Activity {
 		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
 		params.add(new BasicNameValuePair("Pass", reportObservation
 				.getPassword()));
-		params.add(new BasicNameValuePair("heure", reportObservation.getHeure()));
+		params.add(new BasicNameValuePair("heure", String
+				.valueOf(reportObservation.getHeure())));
 		params.add(new BasicNameValuePair("RadioGroup2", reportObservation
 				.getLieu()));
 		params.add(new BasicNameValuePair("Commentaire", reportObservation
@@ -370,25 +386,25 @@ public class ReportObservationActivity extends Activity {
 		cursor.moveToFirst();
 		return cursor.getString(column_index);
 	}
-	
+
 	/**
 	 * Rempli le champ image de la vue
-	 * @param selectedImage l'image sélectionnée
+	 * 
+	 * @param selectedImage
+	 *            l'image sélectionnée
 	 */
-	private void setImageView(Uri selectedImage){
+	private void setImageView(Uri selectedImage) {
 		InputStream imageStream;
 		try {
-			imageStream = getContentResolver().openInputStream(
-					selectedImage);
+			imageStream = getContentResolver().openInputStream(selectedImage);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		Bitmap yourSelectedImage = BitmapFactory
-				.decodeStream(imageStream);
+		Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
 		ImageView v = (ImageView) findViewById(R.id.selectedImage);
 		v.setImageBitmap(yourSelectedImage);
 	}
-	
+
 	/**
 	 * Permet d'afficher le contenu de la gallerie d'images du téléphone
 	 * 
@@ -424,6 +440,49 @@ public class ReportObservationActivity extends Activity {
 				reportObservation.getImageUri());
 		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 		startActivityForResult(intent, SELECT_PHOTO);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.observations_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.change_location:
+			return true;
+		case R.id.change_date: // Modification de l'heure de l'observation
+			int heureCourante = Calendar.getInstance()
+					.get(Calendar.HOUR_OF_DAY);
+
+			final List<String> timeList = new ArrayList<String>(6);
+			for (int i = 0; i < 6; i++) {
+				timeList.add(heureCourante - i + HEURE_SUFFIX);
+			}
+
+			final CharSequence[] items = timeList
+					.toArray(new CharSequence[timeList.size()]);
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(R.string.choix_heure);
+			builder.setItems(items, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					reportObservation.setHeure(item);
+					CheckedTextView v = (CheckedTextView) findViewById(R.id.heureObservation);
+					v.setText(getString(R.string.heure_observation) + " "
+							+ timeList.get(item));
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 }

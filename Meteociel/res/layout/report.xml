@@ -76,13 +76,22 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/divider_horizontal" />
-        
+
+        <CheckedTextView
+            android:id="@+id/heureObservation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckedTextView
+            android:id="@+id/lieuObservation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <Button
             android:id="@+id/soumettreObservation"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/soumettre_observation"
-            />
+            android:text="@string/soumettre_observation" />
     </TableLayout>
 
 </ScrollView>
