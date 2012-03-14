@@ -88,6 +88,21 @@ public class ReportObservationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.report);
 
+		Intent intent = getIntent();
+		Bundle extras = intent.getExtras();
+		String action = intent.getAction();
+
+		// if this is from the share menu
+		if (Intent.ACTION_SEND.equals(action)) {
+			if (extras.containsKey(Intent.EXTRA_STREAM)) {
+				// Get resource path from intent callee
+				Uri uri = (Uri) extras.getParcelable(Intent.EXTRA_STREAM);
+				reportObservation.setImageUri(uri);
+				reportObservation.setPathImage(getPath(uri));
+				setImageView(uri);
+			}
+		}
+
 		// Parcours de la liste des types d'observations et des images
 		// dans le fichier res/values/array.xml et ajout à la
 		// liste passée à l'adapter
@@ -160,50 +175,12 @@ public class ReportObservationActivity extends Activity {
 				if (login.isEmpty() || password.isEmpty()) {
 					dialog.show();
 				} else {
-					// FIXME à remettre
-					// soumettreFormulaireMeteociel(reportObservation);
+					soumettreFormulaireMeteociel(reportObservation);
 					finish();
 				}
 
 			}
 		});
-	}
-
-	/**
-	 * Permet d'afficher le contenu de la gallerie d'images du téléphone
-	 * 
-	 * @param v
-	 */
-	public void afficherGallerie(View v) {
-		Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-		photoPickerIntent.setType("image/*");
-		startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-	}
-
-	/**
-	 * Prend une photo et la socke sous forme de fichier
-	 * 
-	 * @param v
-	 */
-	public void prendrePhoto(View v) {
-
-		// define the file-name to save photo taken by Camera activity
-		String fileName = Calendar.getInstance().getTimeInMillis() + ".jpg";
-		// create parameters for Intent with filename
-		ContentValues values = new ContentValues();
-		values.put(MediaStore.Images.Media.TITLE, fileName);
-		values.put(MediaStore.Images.Media.DESCRIPTION,
-				"Image capture by camera");
-		reportObservation.setImageUri(getContentResolver().insert(
-				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values));
-		reportObservation
-				.setPathImage(getPath(reportObservation.getImageUri()));
-		// create new Intent
-		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		intent.putExtra(MediaStore.EXTRA_OUTPUT,
-				reportObservation.getImageUri());
-		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-		startActivityForResult(intent, SELECT_PHOTO);
 	}
 
 	@Override
@@ -224,17 +201,7 @@ public class ReportObservationActivity extends Activity {
 					reportObservation.setPathImage(getPath(selectedImage));
 				}
 
-				InputStream imageStream;
-				try {
-					imageStream = getContentResolver().openInputStream(
-							selectedImage);
-				} catch (FileNotFoundException e) {
-					throw new RuntimeException(e);
-				}
-				Bitmap yourSelectedImage = BitmapFactory
-						.decodeStream(imageStream);
-				ImageView v = (ImageView) findViewById(R.id.selectedImage);
-				v.setImageBitmap(yourSelectedImage);
+				setImageView(selectedImage);
 
 			}
 
@@ -368,8 +335,7 @@ public class ReportObservationActivity extends Activity {
 
 				loginMeteociel(reportObservation);
 				soumettreImageMeteociel(reportObservation);
-				// FIXME à remettre
-				// soumettreFormulaireMeteociel(reportObservation);
+				soumettreFormulaireMeteociel(reportObservation);
 
 				finish();
 			}
@@ -403,6 +369,61 @@ public class ReportObservationActivity extends Activity {
 				.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 		cursor.moveToFirst();
 		return cursor.getString(column_index);
+	}
+	
+	/**
+	 * Rempli le champ image de la vue
+	 * @param selectedImage l'image sélectionnée
+	 */
+	private void setImageView(Uri selectedImage){
+		InputStream imageStream;
+		try {
+			imageStream = getContentResolver().openInputStream(
+					selectedImage);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		Bitmap yourSelectedImage = BitmapFactory
+				.decodeStream(imageStream);
+		ImageView v = (ImageView) findViewById(R.id.selectedImage);
+		v.setImageBitmap(yourSelectedImage);
+	}
+	
+	/**
+	 * Permet d'afficher le contenu de la gallerie d'images du téléphone
+	 * 
+	 * @param v
+	 */
+	public void afficherGallerie(View v) {
+		Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+		photoPickerIntent.setType("image/*");
+		startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+	}
+
+	/**
+	 * Prend une photo et la socke sous forme de fichier
+	 * 
+	 * @param v
+	 */
+	public void prendrePhoto(View v) {
+
+		// define the file-name to save photo taken by Camera activity
+		String fileName = Calendar.getInstance().getTimeInMillis() + ".jpg";
+		// create parameters for Intent with filename
+		ContentValues values = new ContentValues();
+		values.put(MediaStore.Images.Media.TITLE, fileName);
+		values.put(MediaStore.Images.Media.DESCRIPTION,
+				"Image capture by camera");
+		reportObservation.setImageUri(getContentResolver().insert(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values));
+		reportObservation
+				.setPathImage(getPath(reportObservation.getImageUri()));
+		// create new Intent
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		intent.putExtra(MediaStore.EXTRA_OUTPUT,
+				reportObservation.getImageUri());
+		intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+		startActivityForResult(intent, SELECT_PHOTO);
 	}
 
 }
