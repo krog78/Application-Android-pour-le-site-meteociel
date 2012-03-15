@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -42,6 +43,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.HttpUtils;
+import fr.meteociel.util.MeteocielUtils;
 
 /**
  * Activite de report des observations (upload image + selection observation)
@@ -189,7 +191,8 @@ public class ReportObservationActivity extends Activity {
 				if (login.isEmpty() || password.isEmpty()) {
 					dialog.show();
 				} else {
-					soumettreFormulaireMeteociel(reportObservation);
+					MeteocielUtils.soumettreFormulaireMeteociel(
+							ReportObservationActivity.this, reportObservation);
 					finish();
 				}
 
@@ -255,49 +258,6 @@ public class ReportObservationActivity extends Activity {
 	}
 
 	/**
-	 * Méthode permettant de soumettre un report d'observation au site meteociel
-	 * 
-	 * @param reportObservation
-	 *            le report d'observation à soumettre
-	 */
-	private void soumettreFormulaireMeteociel(
-			ReportObservation reportObservation) {
-		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
-
-		// Ajout des paramètres
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
-		params.add(new BasicNameValuePair("Pass", reportObservation
-				.getPassword()));
-		params.add(new BasicNameValuePair("heure", String
-				.valueOf(reportObservation.getHeure())));
-		params.add(new BasicNameValuePair("RadioGroup2", reportObservation
-				.getLieu()));
-		params.add(new BasicNameValuePair("Commentaire", reportObservation
-				.getTexte()));
-		params.add(new BasicNameValuePair("RadioGroup", reportObservation
-				.getValue()));
-
-		HttpUtils.postRequest(this, url, params);
-	}
-
-	/**
-	 * Méthode permettant de soumettre une image au site Meteociel
-	 * 
-	 * @param reportObservation
-	 */
-	private void soumettreImageMeteociel(ReportObservation reportObservation) {
-		String url = "http://images.meteociel.fr/image_envoi.php";
-
-		if (!reportObservation.getPathImage().isEmpty()) {
-
-			// Ajout des paramètres
-			HttpUtils.uploadImageRequest(url, new ArrayList<NameValuePair>(),
-					reportObservation.getPathImage());
-		}
-	}
-
-	/**
 	 * Méthode de login au site météociel
 	 * 
 	 * @param reportObservation
@@ -349,8 +309,8 @@ public class ReportObservationActivity extends Activity {
 				editor.commit();
 
 				loginMeteociel(reportObservation);
-				soumettreImageMeteociel(reportObservation);
-				soumettreFormulaireMeteociel(reportObservation);
+				MeteocielUtils.soumettreFormulaireMeteociel(
+						ReportObservationActivity.this, reportObservation);
 
 				finish();
 			}

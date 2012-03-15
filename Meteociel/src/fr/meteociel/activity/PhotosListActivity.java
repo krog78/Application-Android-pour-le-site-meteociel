@@ -48,9 +48,8 @@ import org.xml.sax.XMLReader;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,146 +64,17 @@ import fr.meteociel.util.HttpUtils;
  * parses the XML to extract the images' URL and their title.
  */
 public class PhotosListActivity extends Activity {
-	private static final String METEOCIEL_FEED_URL = "http://meteociel.fr/user/day-gallery.php";
+	private static final String METEOCIEL_FEED_URL = "http://www.meteociel.fr/user/day-gallery.php";
 
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-		final List<Observation> listeObservations = new ArrayList<Observation>();
 		
-		final ProgressDialog dialog = ProgressDialog.show(this, "",
-				getString(R.string.chargement), true);
-		final Handler handler = new Handler() {
-			public void handleMessage(Message msg) {
-				list = (ListView) findViewById(R.id.list);
-				adapter = new LazyAdapter(PhotosListActivity.this,
-						listeObservations
-								.toArray(new Observation[listeObservations
-										.size()]));
-				list.setAdapter(adapter);
-				dialog.dismiss();
-			}
-		};
-		Thread checkUpdate = new Thread() {
-			public void run() {
-
-				// System.setProperty("http.proxyHost", "80.78.6.10");
-				// System.setProperty("http.proxyPort", "8080");
-
-				URL url = null;
-				try {
-					url = new URL(METEOCIEL_FEED_URL);
-				} catch (MalformedURLException e1) {
-					throw new RuntimeException(e1);
-				}
-				XMLReader reader = new Parser();
-				try {
-					reader.setFeature(Parser.namespacesFeature, false);
-				} catch (SAXNotRecognizedException e1) {
-					throw new RuntimeException(e1);
-				} catch (SAXNotSupportedException e1) {
-					throw new RuntimeException(e1);
-				}
-				try {
-					reader.setFeature(Parser.namespacePrefixesFeature, false);
-				} catch (SAXNotRecognizedException e1) {
-					throw new RuntimeException(e1);
-				} catch (SAXNotSupportedException e1) {
-					throw new RuntimeException(e1);
-				}
-
-				Transformer transformer;
-				try {
-					transformer = TransformerFactory.newInstance()
-							.newTransformer();
-				} catch (TransformerConfigurationException e1) {
-					throw new RuntimeException(e1);
-				} catch (TransformerFactoryConfigurationError e1) {
-					throw new RuntimeException(e1);
-				}
-
-				DOMResult result = new DOMResult();
-
-				try {
-					InputStream is = url.openStream();
-					try {
-						transformer.transform(new SAXSource(reader,
-								new InputSource(is)), result);
-					} catch (TransformerException e1) {
-						throw new RuntimeException(e1);
-					}
-
-				} catch (IOException e1) {
-					HttpUtils.showConnectionError(PhotosListActivity.this);
-					return;
-				}
-
-				XPathFactory xpf = XPathFactory.newInstance();
-				XPath xpath = xpf.newXPath();
-
-				
-				try {
-					NodeList nodeList = (NodeList) xpath.evaluate("//img",
-							result.getNode(), XPathConstants.NODESET);
-					for (int i = 0; i < nodeList.getLength(); i++) {
-						Node node = nodeList.item(i);
-						NamedNodeMap nodeMap = node.getAttributes();
-
-						// Récupération de l'url de l'image source
-						Node nodeSrc = nodeMap.getNamedItem("src");
-						String src = nodeSrc.getNodeValue();
-
-						if (src.contains("images.meteociel.fr")) {
-							// Récupération du commentaire
-							Node nodeCom = nodeMap.getNamedItem("onmouseover");
-							String commentaire = nodeCom.getNodeValue();
-							String date = commentaire.substring(
-									commentaire.indexOf("('") + 2,
-									commentaire.indexOf("',"));
-							String[] tokens = commentaire.split(",'");
-							String strFormat = tokens[1].substring(0,
-									tokens[1].length() - 1);
-
-							String titre = strFormat.substring(0,
-									strFormat.indexOf("<hr>"));
-							String user = strFormat.substring(
-									strFormat.indexOf("<hr>"),
-									strFormat.indexOf("<br>"));
-							String corps = strFormat.substring(
-									strFormat.indexOf("<br>"),
-									strFormat.length());
-
-							CharSequence styledTitre = Html.fromHtml(titre
-									+ " - " + date + " - " + user);
-
-							CharSequence styledText = Html.fromHtml(corps);
-
-							Observation o = new Observation(
-									StringEscapeUtils.unescapeJavaScript(StringEscapeUtils
-											.unescapeHtml(styledTitre
-													.toString())),
-									StringEscapeUtils
-											.unescapeJavaScript(StringEscapeUtils
-													.unescapeHtml(styledText
-															.toString())), src);
-							listeObservations.add(o);
-
-						}
-					}
-				} catch (XPathExpressionException e) {
-					throw new RuntimeException(e);
-				}
-
-				
-				handler.sendEmptyMessage(0);
-		      }
-		   };
-		   
-		   
-		   
-		   checkUpdate.start();
+		new AfficherObservationsTask().execute();
+		
 	}
 
 	@Override
@@ -240,5 +110,141 @@ public class PhotosListActivity extends Activity {
 
 	ListView list;
 	LazyAdapter adapter;
+	List<Observation> listeObservations = new ArrayList<Observation>();
+	
 
+	private class AfficherObservationsTask extends AsyncTask<Object, Integer, Long> {
+
+		private ProgressDialog dialog;
+		
+		@Override
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(PhotosListActivity.this, "",
+					getString(R.string.chargement), true);
+			super.onPreExecute();
+		}
+		
+		@Override
+		protected Long doInBackground(Object... obj) {
+			URL url = null;
+			try {
+				url = new URL(PhotosListActivity.METEOCIEL_FEED_URL);
+			} catch (MalformedURLException e1) {
+				throw new RuntimeException(e1);
+			}
+			XMLReader reader = new Parser();
+			try {
+				reader.setFeature(Parser.namespacesFeature, false);
+			} catch (SAXNotRecognizedException e1) {
+				throw new RuntimeException(e1);
+			} catch (SAXNotSupportedException e1) {
+				throw new RuntimeException(e1);
+			}
+			try {
+				reader.setFeature(Parser.namespacePrefixesFeature, false);
+			} catch (SAXNotRecognizedException e1) {
+				throw new RuntimeException(e1);
+			} catch (SAXNotSupportedException e1) {
+				throw new RuntimeException(e1);
+			}
+
+			Transformer transformer;
+			try {
+				transformer = TransformerFactory.newInstance()
+						.newTransformer();
+			} catch (TransformerConfigurationException e1) {
+				throw new RuntimeException(e1);
+			} catch (TransformerFactoryConfigurationError e1) {
+				throw new RuntimeException(e1);
+			}
+
+			DOMResult result = new DOMResult();
+
+			try {
+				InputStream is = url.openStream();
+				try {
+					transformer.transform(new SAXSource(reader,
+							new InputSource(is)), result);
+				} catch (TransformerException e1) {
+					throw new RuntimeException(e1);
+				}
+
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				return new Long(1);	
+			}
+
+			XPathFactory xpf = XPathFactory.newInstance();
+			XPath xpath = xpf.newXPath();
+
+			
+			try {
+				NodeList nodeList = (NodeList) xpath.evaluate("//img",
+						result.getNode(), XPathConstants.NODESET);
+				for (int i = 0; i < nodeList.getLength(); i++) {
+					Node node = nodeList.item(i);
+					NamedNodeMap nodeMap = node.getAttributes();
+
+					// Récupération de l'url de l'image source
+					Node nodeSrc = nodeMap.getNamedItem("src");
+					String src = nodeSrc.getNodeValue();
+
+					if (src.contains("images.meteociel.fr")) {
+						// Récupération du commentaire
+						Node nodeCom = nodeMap.getNamedItem("onmouseover");
+						String commentaire = nodeCom.getNodeValue();
+						String date = commentaire.substring(
+								commentaire.indexOf("('") + 2,
+								commentaire.indexOf("',"));
+						String[] tokens = commentaire.split(",'");
+						String strFormat = tokens[1].substring(0,
+								tokens[1].length() - 1);
+
+						String titre = strFormat.substring(0,
+								strFormat.indexOf("<hr>"));
+						String user = strFormat.substring(
+								strFormat.indexOf("<hr>"),
+								strFormat.indexOf("<br>"));
+						String corps = strFormat.substring(
+								strFormat.indexOf("<br>"),
+								strFormat.length());
+
+						CharSequence styledTitre = Html.fromHtml(titre
+								+ " - " + date + " - " + user);
+
+						CharSequence styledText = Html.fromHtml(corps);
+
+						Observation o = new Observation(
+								StringEscapeUtils.unescapeJavaScript(StringEscapeUtils
+										.unescapeHtml(styledTitre
+												.toString())),
+								StringEscapeUtils
+										.unescapeJavaScript(StringEscapeUtils
+												.unescapeHtml(styledText
+														.toString())), src);
+						listeObservations.add(o);
+
+					}
+				}
+			} catch (XPathExpressionException e) {
+				throw new RuntimeException(e);
+			}
+			return new Long(0);
+		}
+		
+		@Override
+		protected void onPostExecute(Long result) {
+			super.onPostExecute(result);
+			if(result == 1){
+				HttpUtils.showConnectionError(PhotosListActivity.this);		
+			}
+			list = (ListView) findViewById(R.id.list);
+			adapter = new LazyAdapter(PhotosListActivity.this,
+					listeObservations.toArray(new Observation[listeObservations
+							.size()]));
+			list.setAdapter(adapter);
+			dialog.dismiss();
+		}
+	}
+	
 }

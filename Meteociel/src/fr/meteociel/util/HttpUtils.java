@@ -14,6 +14,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -107,7 +108,7 @@ public class HttpUtils {
 			List<NameValuePair> params, String filePath) {
 
 		File file = new File(filePath);
-		
+
 		MultipartEntity mpEntity = new MultipartEntity(
 				HttpMultipartMode.BROWSER_COMPATIBLE, BOUNDARY,
 				Charset.forName(CHARSET));
@@ -197,6 +198,27 @@ public class HttpUtils {
 	}
 
 	/**
+	 * Méthode exécutant une requête get
+	 * 
+	 * @param url
+	 *            l'url à appeler
+	 */
+	public static final HttpResponse getRequest(Activity activity, String url) {
+		HttpGet httpGet = new HttpGet(url);
+		HttpResponse httpResponse = null;
+		try {
+			httpResponse = httpClient.execute(httpGet);
+		} catch (ClientProtocolException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			e.printStackTrace();
+			showConnectionError(activity);
+		}
+		return httpResponse;
+
+	}
+
+	/**
 	 * Poste une requête httpPost
 	 * 
 	 * @param url
@@ -206,7 +228,8 @@ public class HttpUtils {
 	 * @param httpPost
 	 * 
 	 */
-	public static final void postRequest(Activity activity, String url, List<NameValuePair> params) {
+	public static final void postRequest(Activity activity, String url,
+			List<NameValuePair> params) {
 
 		// DEBUT Proxy pour chez Atos
 		// HttpHost proxy = new HttpHost("80.78.6.10", 8080);
@@ -227,19 +250,12 @@ public class HttpUtils {
 
 		try {
 			HttpResponse response = httpClient.execute(httpPost, localContext);
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()), BUFFER_SIZE);
-			StringBuilder htmlResponse = new StringBuilder();
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				htmlResponse.append(line);
-			}
-
+			
 			try {
 				File c = new File("/sdcard/test.html");
 
 				BufferedWriter out = new BufferedWriter(new FileWriter(c));
-				out.write(htmlResponse.toString());
+				out.write(httpResponseToString(response));
 				out.close();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -251,24 +267,48 @@ public class HttpUtils {
 			showConnectionError(activity);
 		}
 	}
-	
+
 	/**
 	 * Affiche une alerte sur une erreur de connection
+	 * 
 	 * @param activity
 	 */
-	public static final void showConnectionError(final Activity activity){
+	public static final void showConnectionError(final Activity activity) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setMessage(R.string.erreur_connexion)
-				.setCancelable(false)
-				.setPositiveButton("OK",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int id) {
-								activity.finish();
-							}
-						});
+		builder.setMessage(R.string.erreur_connexion).setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						activity.finish();
+					}
+				});
 		AlertDialog alert = builder.create();
 		alert.show();
+	}
+
+	/**
+	 * Récupère la chaine de la réponse Http
+	 * 
+	 * @param response
+	 *            la réponse http
+	 * @return la chaine html correspondante
+	 */
+	public static final String httpResponseToString(HttpResponse response) {
+		BufferedReader br;
+		StringBuilder htmlResponse = new StringBuilder();
+		try {
+			br = new BufferedReader(new InputStreamReader(response.getEntity()
+					.getContent()), BUFFER_SIZE);
+
+			String line = "";
+			while ((line = br.readLine()) != null) {
+				htmlResponse.append(line);
+			}
+		} catch (IllegalStateException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return htmlResponse.toString();
 	}
 
 }
