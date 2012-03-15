@@ -40,7 +40,6 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.HttpUtils;
 
@@ -279,7 +278,7 @@ public class ReportObservationActivity extends Activity {
 		params.add(new BasicNameValuePair("RadioGroup", reportObservation
 				.getValue()));
 
-		HttpUtils.postRequest(url, params);
+		HttpUtils.postRequest(this, url, params);
 	}
 
 	/**
@@ -315,7 +314,7 @@ public class ReportObservationActivity extends Activity {
 				.getPassword()));
 		params.add(new BasicNameValuePair("expire", "on"));
 
-		HttpUtils.postRequest(url, params);
+		HttpUtils.postRequest(this, url, params);
 	}
 
 	/**

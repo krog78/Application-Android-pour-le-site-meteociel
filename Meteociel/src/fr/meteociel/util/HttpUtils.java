@@ -27,7 +27,11 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import android.os.Environment;
+import fr.meteociel.activity.R;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 /**
  * Classe utilitaire pour les accès Http
@@ -202,7 +206,7 @@ public class HttpUtils {
 	 * @param httpPost
 	 * 
 	 */
-	public static final void postRequest(String url, List<NameValuePair> params) {
+	public static final void postRequest(Activity activity, String url, List<NameValuePair> params) {
 
 		// DEBUT Proxy pour chez Atos
 		// HttpHost proxy = new HttpHost("80.78.6.10", 8080);
@@ -244,8 +248,27 @@ public class HttpUtils {
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			showConnectionError(activity);
 		}
+	}
+	
+	/**
+	 * Affiche une alerte sur une erreur de connection
+	 * @param activity
+	 */
+	public static final void showConnectionError(final Activity activity){
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setMessage(R.string.erreur_connexion)
+				.setCancelable(false)
+				.setPositiveButton("OK",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								activity.finish();
+							}
+						});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 }

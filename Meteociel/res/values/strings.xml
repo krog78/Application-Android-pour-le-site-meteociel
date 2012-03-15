@@ -15,4 +15,6 @@
     <string name="changer_date">Changer de date</string>  
     <string name="choix_heure">Choisissez une heure:</string>
     <string name="heure_observation">Heure de l\'observation:</string>
+    <string name="erreur_connexion">Veuillez activer le transfert de données.</string>
+    <string name="chargement">Chargement en cours...</string>
 </resources>
