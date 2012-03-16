@@ -8,13 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +22,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -41,8 +39,8 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import fr.meteociel.R;
 import fr.meteociel.om.ReportObservation;
-import fr.meteociel.util.HttpUtils;
 import fr.meteociel.util.MeteocielUtils;
 
 /**
@@ -170,8 +168,6 @@ public class ReportObservationActivity extends Activity {
 
 		spin.setAdapter(adapter);
 
-		
-
 		// Gestion du bouton de soumission du formulaire
 		Button soumettre = (Button) findViewById(R.id.soumettreObservation);
 		soumettre.setOnClickListener(new OnClickListener() {
@@ -194,8 +190,7 @@ public class ReportObservationActivity extends Activity {
 				} else {
 					reportObservation.setUser(login);
 					reportObservation.setPassword(password);
-					MeteocielUtils.soumettreFormulaireMeteociel(
-							ReportObservationActivity.this, reportObservation);
+					new EnvoiObservationTask().execute(reportObservation);
 					finish();
 				}
 
@@ -260,8 +255,6 @@ public class ReportObservationActivity extends Activity {
 
 	}
 
-	
-
 	/**
 	 * Création de la boite de dialog de login
 	 * 
@@ -293,9 +286,7 @@ public class ReportObservationActivity extends Activity {
 				// Commit the edits!
 				editor.commit();
 
-				
-				MeteocielUtils.soumettreFormulaireMeteociel(
-						ReportObservationActivity.this, reportObservation);
+				new EnvoiObservationTask().execute(reportObservation);
 
 				finish();
 			}
@@ -426,6 +417,37 @@ public class ReportObservationActivity extends Activity {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Tache permettant d'envoyer le report en arrière plan.
+	 * @author ippon
+	 *
+	 */
+	private class EnvoiObservationTask extends
+			AsyncTask<ReportObservation, Integer, Long> {
+
+		private ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(ReportObservationActivity.this, "",
+					getString(R.string.envoi), true);
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Long doInBackground(ReportObservation... reportObservations) {
+			MeteocielUtils.soumettreFormulaireMeteociel(
+					ReportObservationActivity.this, reportObservations[0]);
+			return new Long(0);
+		}
+
+		@Override
+		protected void onPostExecute(Long result) {
+			super.onPostExecute(result);
+			dialog.dismiss();
 		}
 	}
 

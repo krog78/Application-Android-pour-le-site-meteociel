@@ -28,7 +28,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import fr.meteociel.activity.R;
+import fr.meteociel.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -55,6 +55,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
+import fr.meteociel.R;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
 import fr.meteociel.util.HttpUtils;

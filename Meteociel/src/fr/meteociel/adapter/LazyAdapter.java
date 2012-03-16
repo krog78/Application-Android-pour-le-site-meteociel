@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import fr.meteociel.activity.R;
+import fr.meteociel.R;
 import fr.meteociel.om.Observation;
 import fr.meteociel.util.ImageLoader;
 
