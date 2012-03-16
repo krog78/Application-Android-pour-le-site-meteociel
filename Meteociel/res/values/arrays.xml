@@ -78,5 +78,31 @@
         <item>Mitige</item>
         <item>MitigeNuit</item>
     </string-array>
+     <string-array name="observations_champs">
+        <item>VENT</item>
+        <item>PLUIE_MM</item>
+        <item>PLUIE_MM</item>
+        <item>PLUIE_MM</item>
+        <item>PLUIE_MM</item>
+        <item>PLUIE_MM</item>
+        <item>PLUIE_MM</item>
+        <item>PLUIE_MM</item>
+        <item>NEIGE_CM</item>
+        <item>NEIGE_CM</item>
+        <item>NEIGE_CM</item>
+        <item>NEIGE_CM</item>
+        <item>GRESIL_MM</item>
+        <item>TEMPERATURE</item>
+        <item>VISIBILITE</item>
+        <item>VISIBILITE</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array>
 
 </resources>

@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/change_location"
-        android:icon="@drawable/ic_menu_mylocation"
+        android:icon="@drawable/ic_dialog_map"
         android:title="@string/changer_lieu"
         />
     <item
         android:id="@+id/change_date"
-        android:icon="@drawable/ic_menu_today"
-        android:title="@string/changer_date"/>
+        android:icon="@drawable/ic_dialog_time"
+        android:title="@string/changer_heure"/>
 
 </menu>

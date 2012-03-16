@@ -47,7 +47,7 @@ public class ReportObservation {
 	/**
 	 * Path de l'image sélectionnée
 	 */
-	private String pathImage;
+	private String pathImage = "";
 
 	public String getPathImage() {
 		return pathImage;

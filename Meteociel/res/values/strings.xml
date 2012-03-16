@@ -11,11 +11,12 @@
     <string name="authentification">Veuillez vous authentifier</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string> 
-    <string name="changer_lieu">Changer de lieu</string>
-    <string name="changer_date">Changer de date</string>  
+    <string name="changer_lieu">Changer le lieu</string>
+    <string name="changer_heure">Changer l\'heure</string>  
     <string name="choix_heure">Choisissez une heure:</string>
     <string name="heure_observation">Heure de l\'observation:</string>
     <string name="erreur_connexion">Veuillez activer le transfert de données.</string>
     <string name="chargement">Chargement en cours&#8230;</string>
     <string name="envoi">Envoi en cours&#8230;</string>
+    <string name="report_effectue">Report effectué.</string>
 </resources>

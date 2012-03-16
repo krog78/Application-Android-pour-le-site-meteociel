@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import fr.meteociel.R;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.MeteocielUtils;
@@ -190,8 +192,7 @@ public class ReportObservationActivity extends Activity {
 				} else {
 					reportObservation.setUser(login);
 					reportObservation.setPassword(password);
-					new EnvoiObservationTask().execute(reportObservation);
-					finish();
+					new EnvoiObservationTask().execute(reportObservation);					
 				}
 
 			}
@@ -288,7 +289,7 @@ public class ReportObservationActivity extends Activity {
 
 				new EnvoiObservationTask().execute(reportObservation);
 
-				finish();
+				
 			}
 		});
 
@@ -448,6 +449,10 @@ public class ReportObservationActivity extends Activity {
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
 			dialog.dismiss();
+			Toast toast = Toast.makeText(ReportObservationActivity.this, R.string.report_effectue, 1);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+			ReportObservationActivity.this.finish();
 		}
 	}
 

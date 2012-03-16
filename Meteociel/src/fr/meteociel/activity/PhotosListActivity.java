@@ -98,7 +98,7 @@ public class PhotosListActivity extends Activity {
 		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.refresh:
-			adapter.notifyDataSetChanged();
+			new AfficherObservationsTask().execute();
 			return true;
 		case R.id.report:
 			Intent intent = new Intent(this, ReportObservationActivity.class);

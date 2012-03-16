@@ -48,7 +48,11 @@ public class MeteocielUtils {
 				.getTexte()));
 		params.add(new BasicNameValuePair("RadioGroup", reportObservation
 				.getValue()));
-		params.add(new BasicNameValuePair("imageid", getImageIdMeteociel(activity)));
+		
+		// Si une image est renseignée on récupère son id
+		if(!reportObservation.getPathImage().isEmpty()){
+			params.add(new BasicNameValuePair("imageid", getImageIdMeteociel(activity)));
+		}
 
 		HttpUtils.postRequest(activity, url, params);
 	}
