@@ -29,6 +29,8 @@ public class MeteocielUtils {
 	public static final void soumettreFormulaireMeteociel(Activity activity,
 			ReportObservation reportObservation) {
 
+		loginMeteociel(activity, reportObservation);
+		
 		soumettreImageMeteociel(reportObservation);
 
 		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
@@ -77,5 +79,25 @@ public class MeteocielUtils {
 		String html = HttpUtils.httpResponseToString(response);
 		String imageid = StringUtils.substringBetween(html, "javascript:selectImage(", ",");
 		return imageid;
+	}
+	
+	/**
+	 * Méthode de login au site météociel
+	 * 
+	 * @param reportObservation
+	 *            le report de l'observation
+	 */
+	public static final void loginMeteociel(Activity activity, ReportObservation reportObservation) {
+
+		String url = "http://www.meteociel.fr/connexion.php";
+
+		// Ajout des paramètres
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
+		params.add(new BasicNameValuePair("Pass", reportObservation
+				.getPassword()));
+		params.add(new BasicNameValuePair("expire", "on"));
+
+		HttpUtils.postRequest(activity, url, params);
 	}
 }

@@ -170,8 +170,7 @@ public class ReportObservationActivity extends Activity {
 
 		spin.setAdapter(adapter);
 
-		// Boite de dialogue login
-		final Dialog dialog = creerDialogLogin();
+		
 
 		// Gestion du bouton de soumission du formulaire
 		Button soumettre = (Button) findViewById(R.id.soumettreObservation);
@@ -189,8 +188,12 @@ public class ReportObservationActivity extends Activity {
 				String password = settings.getString(PREF_PWD, "");
 
 				if (login.isEmpty() || password.isEmpty()) {
+					// Boite de dialogue login
+					final Dialog dialog = creerDialogLogin();
 					dialog.show();
 				} else {
+					reportObservation.setUser(login);
+					reportObservation.setPassword(password);
 					MeteocielUtils.soumettreFormulaireMeteociel(
 							ReportObservationActivity.this, reportObservation);
 					finish();
@@ -257,25 +260,7 @@ public class ReportObservationActivity extends Activity {
 
 	}
 
-	/**
-	 * Méthode de login au site météociel
-	 * 
-	 * @param reportObservation
-	 *            le report de l'observation
-	 */
-	private void loginMeteociel(ReportObservation reportObservation) {
-
-		String url = "http://www.meteociel.fr/connexion.php";
-
-		// Ajout des paramètres
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("Login", reportObservation.getUser()));
-		params.add(new BasicNameValuePair("Pass", reportObservation
-				.getPassword()));
-		params.add(new BasicNameValuePair("expire", "on"));
-
-		HttpUtils.postRequest(this, url, params);
-	}
+	
 
 	/**
 	 * Création de la boite de dialog de login
@@ -308,7 +293,7 @@ public class ReportObservationActivity extends Activity {
 				// Commit the edits!
 				editor.commit();
 
-				loginMeteociel(reportObservation);
+				
 				MeteocielUtils.soumettreFormulaireMeteociel(
 						ReportObservationActivity.this, reportObservation);
 
