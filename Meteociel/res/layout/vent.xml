@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/vent_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" >
+
+    <TableRow>
+
+        <EditText
+            android:id="@+id/vitesse"
+            android:gravity="center"
+            android:inputType="number" />
+
+        <TextView android:text="@string/kmh" />
+    </TableRow>
+
+    <TableRow>
+
+        <Spinner
+            android:id="@+id/direction"
+            android:entries="@array/direction_vent" />
+    </TableRow>
+
+    <TableRow>
+
+        <Button
+            android:id="@+id/ok"
+            android:text="@string/ok" />
+    </TableRow>
+
+</TableLayout>

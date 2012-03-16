@@ -9,6 +9,10 @@ import android.net.Uri;
  */
 public class ReportObservation {
 	
+	public ReportObservation() {
+		super();
+	}
+
 	/**
 	 * Login utilisateur
 	 */
@@ -48,7 +52,7 @@ public class ReportObservation {
 	 * Path de l'image sélectionnée
 	 */
 	private String pathImage = "";
-
+	
 	public String getPathImage() {
 		return pathImage;
 	}
@@ -112,6 +116,20 @@ public class ReportObservation {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public ReportObservation(ReportObservation obs) {
+		super();
+		this.user = obs.user;
+		this.password = obs.password;
+		this.lieu = obs.lieu;
+		this.heure = obs.heure;
+		this.texte = obs.texte;
+		this.value = obs.value;
+		this.imageUri = obs.imageUri;
+		this.pathImage = obs.pathImage;
+	}
+
+
+
 	
-	//private String image;
 }

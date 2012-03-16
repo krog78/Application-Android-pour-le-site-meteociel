@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.text.TableView;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,13 +40,23 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.meteociel.R;
+import fr.meteociel.om.Gresil;
+import fr.meteociel.om.Neige;
+import fr.meteociel.om.Pluie;
 import fr.meteociel.om.ReportObservation;
+import fr.meteociel.om.Temperature;
+import fr.meteociel.om.Vent;
+import fr.meteociel.om.Visibilite;
 import fr.meteociel.util.MeteocielUtils;
+import fr.meteociel.util.TypeChampSupp;
 
 /**
  * Activite de report des observations (upload image + selection observation)
@@ -71,6 +84,12 @@ public class ReportObservationActivity extends Activity {
 	private static final String HEURE_SUFFIX = ":00";
 
 	private static final int SELECT_PHOTO = 100;
+
+	/**
+	 * Compteur utilisé pour savoir si on est à l'initialisation ou à la
+	 * sélection dans le spinner du type de l'observation
+	 */
+	private boolean spinnerInit = false;
 
 	/**
 	 * Description de l'observation
@@ -130,6 +149,8 @@ public class ReportObservationActivity extends Activity {
 				R.array.observations_img);
 		final String[] listValueObs = getResources().getStringArray(
 				R.array.observations_value);
+		final String[] listChampsObs = getResources().getStringArray(
+				R.array.observations_champs);
 
 		if (listTypeObs.length != imgs.length()
 				|| listTypeObs.length != listValueObs.length) {
@@ -150,12 +171,121 @@ public class ReportObservationActivity extends Activity {
 		}
 
 		// Rempli la liste déroulante des types d'observations
-		Spinner spin = (Spinner) findViewById(R.id.selectObservation);
+		final Spinner spin = (Spinner) findViewById(R.id.selectObservation);
 
 		spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int pos, long id) {
 				reportObservation.setValue(listValueObs[pos]);
+
+				// Initialisation de la boite de dialogue pour les champs
+				// supplémentaires si le champs est renseigné dans le array.xml
+				if (spinnerInit && !listChampsObs[pos].isEmpty()) {
+										
+					// On instancie notre layout en tant que View
+					TypeChampSupp t = TypeChampSupp.valueOf(listChampsObs[pos]);
+					switch (t) {
+					case VENT:
+						
+						final AlertDialog alerte = prepareAlert(R.layout.vent);
+						final Button button = (Button) alerte
+								.findViewById(R.id.ok);
+						button.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								Vent vent = new Vent(reportObservation,((TextView)alerte
+										.findViewById(R.id.vitesse)).getText().toString(),
+										((CharSequence)((Spinner)alerte
+												.findViewById(R.id.direction)).getSelectedItem()).toString());
+								reportObservation = vent;
+								alerte.cancel();
+							}
+						});
+						break;
+					case PLUIE_MM:
+						
+						final AlertDialog alertPluie = prepareAlert(R.layout.texte_libelle);
+						TextView libelleView = (TextView)alertPluie.findViewById(R.id.libelle);
+						libelleView.setText(getString(R.string.mm));
+						final Button buttonPluie = (Button) alertPluie
+								.findViewById(R.id.ok);
+						buttonPluie.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								Pluie pluie = new Pluie(reportObservation, ((TextView)alertPluie
+										.findViewById(R.id.texte)).getText().toString());
+								reportObservation = pluie;
+								alertPluie.cancel();
+							}
+						});
+						break;
+					case NEIGE_CM:
+						final AlertDialog alertNeige = prepareAlert(R.layout.texte_libelle);
+						TextView libelleViewNeige = (TextView)alertNeige.findViewById(R.id.libelle);
+						libelleViewNeige.setText(getString(R.string.cm));
+						final Button buttonNeige = (Button) alertNeige
+								.findViewById(R.id.ok);
+						buttonNeige.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								Neige neige = new Neige(reportObservation, ((TextView)alertNeige
+										.findViewById(R.id.texte)).getText().toString());
+								reportObservation = neige;
+								alertNeige.cancel();
+							}
+						});
+						break;
+					case GRESIL_MM:
+						final AlertDialog alertGresil = prepareAlert(R.layout.texte_libelle);
+						TextView libelleViewGresil = (TextView)alertGresil.findViewById(R.id.libelle);
+						libelleViewGresil.setText(getString(R.string.mm));
+						final Button buttonGresil = (Button) alertGresil
+								.findViewById(R.id.ok);
+						buttonGresil.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								Gresil gresil = new Gresil(reportObservation, ((TextView)alertGresil
+										.findViewById(R.id.texte)).getText().toString());
+								reportObservation = gresil;
+								alertGresil.cancel();
+							}
+						});	
+						break;
+					case TEMPERATURE:
+						final AlertDialog alertTemp = prepareAlert(R.layout.texte_libelle);
+						
+						TextView libelleViewTemp = (TextView)alertTemp.findViewById(R.id.libelle);
+						libelleViewTemp.setText(getString(R.string.degres));
+						final Button buttonTemp = (Button) alertTemp
+								.findViewById(R.id.ok);
+						buttonTemp.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								Temperature temperature = new Temperature(reportObservation, ((TextView)alertTemp
+										.findViewById(R.id.texte)).getText().toString());
+								reportObservation = temperature;
+								alertTemp.cancel();
+							}
+						});	
+						break;
+					case VISIBILITE:
+						final AlertDialog alertVisi = prepareAlert(R.layout.texte_libelle);
+						
+						TextView libelleViewVisi = (TextView)alertVisi.findViewById(R.id.libelle);
+						libelleViewVisi.setText(getString(R.string.visibilite));
+						final Button buttonVisi = (Button) alertVisi
+								.findViewById(R.id.ok);
+						buttonVisi.setOnClickListener(new View.OnClickListener() {
+							public void onClick(View v) {
+								Visibilite visibilite = new Visibilite(reportObservation, ((TextView)alertVisi
+										.findViewById(R.id.texte)).getText().toString());
+								reportObservation = visibilite;
+								alertVisi.cancel();
+							}
+						});
+						break;
+					}
+
+					
+				} else {
+					spinnerInit = true;
+				}
+
 			}
 
 			public void onNothingSelected(AdapterView<?> parent) {
@@ -192,13 +322,28 @@ public class ReportObservationActivity extends Activity {
 				} else {
 					reportObservation.setUser(login);
 					reportObservation.setPassword(password);
-					new EnvoiObservationTask().execute(reportObservation);					
+					new EnvoiObservationTask().execute(reportObservation);
 				}
 
 			}
 		});
 	}
-
+	
+	/**
+	 * Prepare une alerte 
+	 * @return l'alerte correspondante
+	 */
+	private AlertDialog prepareAlert(int idLayout){
+		// Création de l'AlertDialog
+		AlertDialog.Builder adb = new AlertDialog.Builder(
+				ReportObservationActivity.this);
+		View alertDialogView = getLayoutInflater().inflate(idLayout, null);
+		adb.setView(alertDialogView);
+		final AlertDialog alert = adb.create();
+		alert.show();
+		return alert;
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent imageReturnedIntent) {
@@ -289,7 +434,6 @@ public class ReportObservationActivity extends Activity {
 
 				new EnvoiObservationTask().execute(reportObservation);
 
-				
 			}
 		});
 
@@ -423,8 +567,9 @@ public class ReportObservationActivity extends Activity {
 
 	/**
 	 * Tache permettant d'envoyer le report en arrière plan.
+	 * 
 	 * @author ippon
-	 *
+	 * 
 	 */
 	private class EnvoiObservationTask extends
 			AsyncTask<ReportObservation, Integer, Long> {
@@ -449,7 +594,8 @@ public class ReportObservationActivity extends Activity {
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
 			dialog.dismiss();
-			Toast toast = Toast.makeText(ReportObservationActivity.this, R.string.report_effectue, 1);
+			Toast toast = Toast.makeText(ReportObservationActivity.this,
+					R.string.report_effectue, 1);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
 			ReportObservationActivity.this.finish();

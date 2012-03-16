@@ -19,4 +19,9 @@
     <string name="chargement">Chargement en cours&#8230;</string>
     <string name="envoi">Envoi en cours&#8230;</string>
     <string name="report_effectue">Report effectué.</string>
+    <string name="kmh">km/h</string>
+    <string name="mm">mm</string>
+    <string name="cm">cm</string>
+    <string name="degres">°C (à l\'ombre uniquement)</string>
+    <string name="visibilite">m de visibilité</string>
 </resources>
