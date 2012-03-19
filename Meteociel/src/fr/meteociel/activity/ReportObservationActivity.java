@@ -4,22 +4,16 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.swing.text.TableView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,35 +22,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.SimpleAdapter;
-import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.meteociel.R;
-import fr.meteociel.om.Gresil;
-import fr.meteociel.om.Neige;
-import fr.meteociel.om.Pluie;
 import fr.meteociel.om.ReportObservation;
-import fr.meteociel.om.Temperature;
-import fr.meteociel.om.Vent;
-import fr.meteociel.om.Visibilite;
 import fr.meteociel.util.MeteocielUtils;
-import fr.meteociel.util.TypeChampSupp;
 
 /**
  * Activite de report des observations (upload image + selection observation)
@@ -91,20 +70,7 @@ public class ReportObservationActivity extends Activity {
 	 */
 	private boolean spinnerInit = false;
 
-	/**
-	 * Description de l'observation
-	 */
-	private static final String DESC_OBSERVATION = "DESC_OBSERVATION";
 
-	/**
-	 * Image de l'observation
-	 */
-	private static final String IMG_OBSERVATION = "IMG_OBSERVATION";
-
-	/**
-	 * Valeur meteociel de l'observation
-	 */
-	private static final String VALUE_OBSERVATION = "VALUE_OBSERVATION";
 
 	/**
 	 * Objet stateful representant le report d'observation
@@ -138,167 +104,10 @@ public class ReportObservationActivity extends Activity {
 			}
 		}
 
-		// Parcours de la liste des types d'observations et des images
-		// dans le fichier res/values/array.xml et ajout à la
-		// liste passée à l'adapter
-		List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
-
-		String[] listTypeObs = getResources().getStringArray(
-				R.array.observations);
-		TypedArray imgs = getResources().obtainTypedArray(
-				R.array.observations_img);
-		final String[] listValueObs = getResources().getStringArray(
-				R.array.observations_value);
-		final String[] listChampsObs = getResources().getStringArray(
-				R.array.observations_champs);
-
-		if (listTypeObs.length != imgs.length()
-				|| listTypeObs.length != listValueObs.length) {
-			throw new RuntimeException(
-					"Problème de configuration du fichier array.xml: "
-							+ "les tailles de la liste du texte et des "
-							+ "images sont différentes.");
-		}
-
-		for (int i = 0; i < listTypeObs.length; i++) {
-
-			HashMap<String, Object> map = new HashMap<String, Object>(2);
-			map.put(DESC_OBSERVATION, listTypeObs[i]);
-			map.put(IMG_OBSERVATION, imgs.getResourceId(i, -1));
-			map.put(VALUE_OBSERVATION, listValueObs[i]);
-			list.add(map);
-
-		}
-
-		// Rempli la liste déroulante des types d'observations
-		final Spinner spin = (Spinner) findViewById(R.id.selectObservation);
-
-		spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int pos, long id) {
-				reportObservation.setValue(listValueObs[pos]);
-
-				// Initialisation de la boite de dialogue pour les champs
-				// supplémentaires si le champs est renseigné dans le array.xml
-				if (spinnerInit && !listChampsObs[pos].isEmpty()) {
-										
-					// On instancie notre layout en tant que View
-					TypeChampSupp t = TypeChampSupp.valueOf(listChampsObs[pos]);
-					switch (t) {
-					case VENT:
-						
-						final AlertDialog alerte = prepareAlert(R.layout.vent);
-						final Button button = (Button) alerte
-								.findViewById(R.id.ok);
-						button.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Vent vent = new Vent(reportObservation,((TextView)alerte
-										.findViewById(R.id.vitesse)).getText().toString(),
-										((CharSequence)((Spinner)alerte
-												.findViewById(R.id.direction)).getSelectedItem()).toString());
-								reportObservation = vent;
-								alerte.cancel();
-							}
-						});
-						break;
-					case PLUIE_MM:
-						
-						final AlertDialog alertPluie = prepareAlert(R.layout.texte_libelle);
-						TextView libelleView = (TextView)alertPluie.findViewById(R.id.libelle);
-						libelleView.setText(getString(R.string.mm));
-						final Button buttonPluie = (Button) alertPluie
-								.findViewById(R.id.ok);
-						buttonPluie.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Pluie pluie = new Pluie(reportObservation, ((TextView)alertPluie
-										.findViewById(R.id.texte)).getText().toString());
-								reportObservation = pluie;
-								alertPluie.cancel();
-							}
-						});
-						break;
-					case NEIGE_CM:
-						final AlertDialog alertNeige = prepareAlert(R.layout.texte_libelle);
-						TextView libelleViewNeige = (TextView)alertNeige.findViewById(R.id.libelle);
-						libelleViewNeige.setText(getString(R.string.cm));
-						final Button buttonNeige = (Button) alertNeige
-								.findViewById(R.id.ok);
-						buttonNeige.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Neige neige = new Neige(reportObservation, ((TextView)alertNeige
-										.findViewById(R.id.texte)).getText().toString());
-								reportObservation = neige;
-								alertNeige.cancel();
-							}
-						});
-						break;
-					case GRESIL_MM:
-						final AlertDialog alertGresil = prepareAlert(R.layout.texte_libelle);
-						TextView libelleViewGresil = (TextView)alertGresil.findViewById(R.id.libelle);
-						libelleViewGresil.setText(getString(R.string.mm));
-						final Button buttonGresil = (Button) alertGresil
-								.findViewById(R.id.ok);
-						buttonGresil.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Gresil gresil = new Gresil(reportObservation, ((TextView)alertGresil
-										.findViewById(R.id.texte)).getText().toString());
-								reportObservation = gresil;
-								alertGresil.cancel();
-							}
-						});	
-						break;
-					case TEMPERATURE:
-						final AlertDialog alertTemp = prepareAlert(R.layout.texte_libelle);
-						
-						TextView libelleViewTemp = (TextView)alertTemp.findViewById(R.id.libelle);
-						libelleViewTemp.setText(getString(R.string.degres));
-						final Button buttonTemp = (Button) alertTemp
-								.findViewById(R.id.ok);
-						buttonTemp.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Temperature temperature = new Temperature(reportObservation, ((TextView)alertTemp
-										.findViewById(R.id.texte)).getText().toString());
-								reportObservation = temperature;
-								alertTemp.cancel();
-							}
-						});	
-						break;
-					case VISIBILITE:
-						final AlertDialog alertVisi = prepareAlert(R.layout.texte_libelle);
-						
-						TextView libelleViewVisi = (TextView)alertVisi.findViewById(R.id.libelle);
-						libelleViewVisi.setText(getString(R.string.visibilite));
-						final Button buttonVisi = (Button) alertVisi
-								.findViewById(R.id.ok);
-						buttonVisi.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								Visibilite visibilite = new Visibilite(reportObservation, ((TextView)alertVisi
-										.findViewById(R.id.texte)).getText().toString());
-								reportObservation = visibilite;
-								alertVisi.cancel();
-							}
-						});
-						break;
-					}
-
-					
-				} else {
-					spinnerInit = true;
-				}
-
-			}
-
-			public void onNothingSelected(AdapterView<?> parent) {
-			}
-		});
-
-		SpinnerObservationAdapter adapter = new SpinnerObservationAdapter(
-				getApplicationContext(), list, R.layout.type_observation,
-				new String[] { DESC_OBSERVATION, IMG_OBSERVATION,
-						VALUE_OBSERVATION },
-				new int[] { R.id.text, R.id.image });
-
-		spin.setAdapter(adapter);
+		
+		// Création du spinner
+		MeteocielUtils.createSpinner(this);
+		
 
 		// Gestion du bouton de soumission du formulaire
 		Button soumettre = (Button) findViewById(R.id.soumettreObservation);
@@ -333,7 +142,7 @@ public class ReportObservationActivity extends Activity {
 	 * Prepare une alerte 
 	 * @return l'alerte correspondante
 	 */
-	private AlertDialog prepareAlert(int idLayout){
+	public AlertDialog prepareAlert(int idLayout){
 		// Création de l'AlertDialog
 		AlertDialog.Builder adb = new AlertDialog.Builder(
 				ReportObservationActivity.this);
@@ -369,37 +178,7 @@ public class ReportObservationActivity extends Activity {
 		}
 	}
 
-	private class SpinnerObservationAdapter extends SimpleAdapter {
-
-		public SpinnerObservationAdapter(Context context,
-				List<? extends Map<String, ?>> data, int resource,
-				String[] from, int[] to) {
-			super(context, data, resource, from, to);
-
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-
-			if (convertView == null) {
-				convertView = getLayoutInflater().inflate(
-						R.layout.type_observation, null);
-			}
-
-			HashMap<String, Object> data = (HashMap<String, Object>) getItem(position);
-
-			String texteObservation = (String) data.get(DESC_OBSERVATION);
-			int imgId = (Integer) data.get(IMG_OBSERVATION);
-
-			((TextView) convertView.findViewById(R.id.text))
-					.setText(texteObservation);
-			((ImageView) convertView.findViewById(R.id.image))
-					.setImageResource(imgId);
-
-			return convertView;
-		}
-
-	}
+	
 
 	/**
 	 * Création de la boite de dialog de login
@@ -600,6 +379,22 @@ public class ReportObservationActivity extends Activity {
 			toast.show();
 			ReportObservationActivity.this.finish();
 		}
+	}
+
+	public ReportObservation getReportObservation() {
+		return reportObservation;
+	}
+
+	public void setReportObservation(ReportObservation reportObservation) {
+		this.reportObservation = reportObservation;
+	}
+
+	public boolean isSpinnerInit() {
+		return spinnerInit;
+	}
+
+	public void setSpinnerInit(boolean spinnerInit) {
+		this.spinnerInit = spinnerInit;
 	}
 
 }
