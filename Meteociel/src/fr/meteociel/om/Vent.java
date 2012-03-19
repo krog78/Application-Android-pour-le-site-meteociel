@@ -19,12 +19,12 @@ public class Vent extends ReportObservation implements IReportObservation{
 	/**
 	 * Vitesse du vent
 	 */
-	private String vitesse;
+	private String vitesse = "0";
 
 	/**
 	 * Direction du vent
 	 */
-	private String direction;
+	private String direction = "";
 
 	public String getVitesse() {
 		return vitesse;

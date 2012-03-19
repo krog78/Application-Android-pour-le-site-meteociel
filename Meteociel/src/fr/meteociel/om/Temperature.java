@@ -12,7 +12,7 @@ public class Temperature extends ReportObservation implements IReportObservation
 	/**
 	 * Température en degrés
 	 */
-	private String degres;
+	private String degres = "0";
 
 	public Temperature(ReportObservation obs, String degres) {
 		super(obs);

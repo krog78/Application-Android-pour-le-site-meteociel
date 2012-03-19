@@ -27,7 +27,7 @@ public class ReportObservation implements IReportObservation{
 	/**
 	 * Lieu de l'observation
 	 */
-	private String lieu = "Lieu0";
+	private Lieu lieu = new Lieu();
 	
 	/**
 	 * Heure de l'observation
@@ -86,14 +86,6 @@ public class ReportObservation implements IReportObservation{
 		this.imageUri = imageUri;
 	}
 
-	public String getLieu() {
-		return lieu;
-	}
-
-	public void setLieu(String lieu) {
-		this.lieu = lieu;
-	}
-
 	public int getHeure() {
 		return heure;
 	}
@@ -133,6 +125,14 @@ public class ReportObservation implements IReportObservation{
 	@Override
 	public TypeChampSupp getTypeChampSupp() {
 		return TypeChampSupp.AUTRE;
+	}
+
+	public void setLieu(Lieu lieu) {
+		this.lieu = lieu;
+	}
+
+	public Lieu getLieu() {
+		return lieu;
 	}
 
 

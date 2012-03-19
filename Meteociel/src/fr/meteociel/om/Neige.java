@@ -12,7 +12,7 @@ public class Neige extends ReportObservation implements IReportObservation{
 	/**
 	 * Hauteur de neige en cm
 	 */
-	private String hauteur;
+	private String hauteur = "0";
 
 	public Neige(ReportObservation obs, String hauteur) {
 		super(obs);

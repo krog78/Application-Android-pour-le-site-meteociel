@@ -78,8 +78,14 @@ public class MeteocielUtils {
 				.getPassword()));
 		params.add(new BasicNameValuePair("heure", String
 				.valueOf(reportObservation.getHeure())));
-		params.add(new BasicNameValuePair("RadioGroup2", reportObservation
-				.getLieu()));
+		
+		if(reportObservation.getLieu().getVille().isEmpty()){
+			params.add(new BasicNameValuePair("RadioGroup2", "Lieu0"));
+		}else{
+			params.add(new BasicNameValuePair("ville", reportObservation.getLieu().getVille()));
+			params.add(new BasicNameValuePair("Altitude", reportObservation.getLieu().getAltitude()));
+		}
+		
 		params.add(new BasicNameValuePair("Commentaire", reportObservation
 				.getTexte()));
 		params.add(new BasicNameValuePair("RadioGroup", reportObservation

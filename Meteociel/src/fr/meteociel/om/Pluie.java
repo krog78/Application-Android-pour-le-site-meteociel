@@ -12,7 +12,7 @@ public class Pluie extends ReportObservation implements IReportObservation{
 	/**
 	 * Hauteur de pluie en mm
 	 */
-	private String hauteur;
+	private String hauteur = "0";
 
 	public Pluie(ReportObservation obs, String hauteur) {
 		super(obs);

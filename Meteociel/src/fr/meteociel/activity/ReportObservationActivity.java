@@ -27,12 +27,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.meteociel.R;
@@ -314,7 +313,22 @@ public class ReportObservationActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.change_location:
+		case R.id.change_location: // On change le lieu
+			final AlertDialog alerteLieu = prepareAlert(R.layout.lieu);
+			final Button okLieu = (Button)alerteLieu.findViewById(R.id.ok);
+			okLieu.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					EditText ville = (EditText)alerteLieu.findViewById(R.id.ville);
+					reportObservation.getLieu().setVille(ville.getText().toString());
+					
+					EditText altitude = (EditText)alerteLieu.findViewById(R.id.altitude);
+					reportObservation.getLieu().setAltitude(altitude.getText().toString());
+					
+					alerteLieu.cancel();
+				}
+			});
 			return true;
 		case R.id.change_date: // Modification de l'heure de l'observation
 			int heureCourante = Calendar.getInstance()

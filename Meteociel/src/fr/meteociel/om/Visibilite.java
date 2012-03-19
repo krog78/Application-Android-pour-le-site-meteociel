@@ -12,7 +12,7 @@ public class Visibilite extends ReportObservation implements IReportObservation{
 	/**
 	 * Visibilité en mètres
 	 */
-	private String longueur;
+	private String longueur = "0";
 
 	public Visibilite(ReportObservation obs, String longueur) {
 		super(obs);

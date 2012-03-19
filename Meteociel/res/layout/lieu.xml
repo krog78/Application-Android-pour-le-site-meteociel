@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lieu_linearLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center|center_horizontal" >
+
+    <TableLayout
+        android:id="@+id/lieu_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center" >
+
+        <TextView
+            android:text="@string/ville" />
+
+        <TableRow android:layout_width="wrap_content" >
+
+            <EditText
+                android:id="@+id/ville"
+                android:inputType="text"
+                android:width="100dp" />
+        </TableRow>
+
+        <TextView
+            android:text="@string/altitude" />
+
+        <TableRow android:layout_width="wrap_content" >
+
+            <EditText
+                android:id="@+id/altitude"
+                android:inputType="number"
+                android:width="100dp" />
+
+            <TextView
+                android:text="@string/metre" />
+        </TableRow>
+
+        <TableRow android:layout_width="wrap_content" >
+
+            <Button
+                android:id="@+id/ok"
+                android:text="@string/ok" />
+        </TableRow>
+    </TableLayout>
+
+</LinearLayout>

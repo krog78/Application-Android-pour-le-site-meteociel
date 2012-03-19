@@ -12,7 +12,7 @@ public class Gresil extends ReportObservation implements IReportObservation{
 	/**
 	 * Hauteur de gresil en mm
 	 */
-	private String hauteur;
+	private String hauteur = "0";
 
 	public Gresil(ReportObservation obs, String hauteur) {
 		super(obs);

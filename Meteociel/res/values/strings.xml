@@ -24,4 +24,7 @@
     <string name="cm">cm</string>
     <string name="degres">°C (à l\'ombre uniquement)</string>
     <string name="visibilite">m de visibilité</string>
+    <string name="ville">Ville:</string>
+    <string name="altitude">Altitude:</string>
+    <string name="metre">m</string>
 </resources>
