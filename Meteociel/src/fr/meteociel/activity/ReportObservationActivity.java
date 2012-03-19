@@ -46,6 +46,11 @@ import fr.meteociel.util.MeteocielUtils;
  */
 public class ReportObservationActivity extends Activity {
 
+	
+	protected ProgressDialog dialogProgress;
+	
+	protected Dialog dialogLogin;
+	
 	/**
 	 * Préférences de l'appli météociel
 	 */
@@ -71,13 +76,16 @@ public class ReportObservationActivity extends Activity {
 	 */
 	private boolean spinnerInit = false;
 
-
-
 	/**
 	 * Objet stateful representant le report d'observation
 	 */
 	private ReportObservation reportObservation = new ReportObservation();
 
+	/**
+	 * Tache de fond d'envoi de l'observation
+	 */
+	private EnvoiObservationTask envoiObservationTask = new EnvoiObservationTask();
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -105,10 +113,8 @@ public class ReportObservationActivity extends Activity {
 			}
 		}
 
-		
 		// Création du spinner
 		MeteocielUtils.createSpinner(this);
-		
 
 		// Gestion du bouton de soumission du formulaire
 		Button soumettre = (Button) findViewById(R.id.soumettreObservation);
@@ -127,23 +133,27 @@ public class ReportObservationActivity extends Activity {
 
 				if (login.isEmpty() || password.isEmpty()) {
 					// Boite de dialogue login
-					final Dialog dialog = creerDialogLogin();
-					dialog.show();
+					dialogLogin = creerDialogLogin();
+					dialogLogin.show();
 				} else {
 					reportObservation.setUser(login);
 					reportObservation.setPassword(password);
-					new EnvoiObservationTask().execute(reportObservation);
+					
+					dialogProgress = ProgressDialog.show(ReportObservationActivity.this, "",
+							getString(R.string.envoi), true);
+					envoiObservationTask.execute(reportObservation);
 				}
 
 			}
 		});
 	}
-	
+
 	/**
-	 * Prepare une alerte 
+	 * Prepare une alerte
+	 * 
 	 * @return l'alerte correspondante
 	 */
-	public AlertDialog prepareAlert(int idLayout){
+	public AlertDialog prepareAlert(int idLayout) {
 		// Création de l'AlertDialog
 		AlertDialog.Builder adb = new AlertDialog.Builder(
 				ReportObservationActivity.this);
@@ -153,7 +163,7 @@ public class ReportObservationActivity extends Activity {
 		alert.show();
 		return alert;
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent imageReturnedIntent) {
@@ -179,15 +189,13 @@ public class ReportObservationActivity extends Activity {
 		}
 	}
 
-	
-
 	/**
 	 * Création de la boite de dialog de login
 	 * 
 	 * @return la boite de dialogue
 	 */
 	private Dialog creerDialogLogin() {
-		final Dialog dialog = new Dialog(this);
+		final Dialog dialog = new Dialog(ReportObservationActivity.this);
 
 		dialog.setContentView(R.layout.login_dialog);
 		dialog.setTitle(R.string.authentification);
@@ -212,7 +220,9 @@ public class ReportObservationActivity extends Activity {
 				// Commit the edits!
 				editor.commit();
 
-				new EnvoiObservationTask().execute(reportObservation);
+				dialogProgress = ProgressDialog.show(ReportObservationActivity.this, "",
+						getString(R.string.envoi), true);
+				envoiObservationTask.execute(reportObservation);
 
 			}
 		});
@@ -315,17 +325,21 @@ public class ReportObservationActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.change_location: // On change le lieu
 			final AlertDialog alerteLieu = prepareAlert(R.layout.lieu);
-			final Button okLieu = (Button)alerteLieu.findViewById(R.id.ok);
+			final Button okLieu = (Button) alerteLieu.findViewById(R.id.ok);
 			okLieu.setOnClickListener(new OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
-					EditText ville = (EditText)alerteLieu.findViewById(R.id.ville);
-					reportObservation.getLieu().setVille(ville.getText().toString());
-					
-					EditText altitude = (EditText)alerteLieu.findViewById(R.id.altitude);
-					reportObservation.getLieu().setAltitude(altitude.getText().toString());
-					
+					EditText ville = (EditText) alerteLieu
+							.findViewById(R.id.ville);
+					reportObservation.getLieu().setVille(
+							ville.getText().toString());
+
+					EditText altitude = (EditText) alerteLieu
+							.findViewById(R.id.altitude);
+					reportObservation.getLieu().setAltitude(
+							altitude.getText().toString());
+
 					alerteLieu.cancel();
 				}
 			});
@@ -369,12 +383,11 @@ public class ReportObservationActivity extends Activity {
 	private class EnvoiObservationTask extends
 			AsyncTask<ReportObservation, Integer, Long> {
 
-		private ProgressDialog dialog;
+		
 
 		@Override
 		protected void onPreExecute() {
-			dialog = ProgressDialog.show(ReportObservationActivity.this, "",
-					getString(R.string.envoi), true);
+			
 			super.onPreExecute();
 		}
 
@@ -388,15 +401,15 @@ public class ReportObservationActivity extends Activity {
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
-			dialog.dismiss();
-			Toast toast = Toast.makeText(ReportObservationActivity.this,
+			dialogProgress.dismiss();
+			Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
 					R.string.report_effectue, 1);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
 			ReportObservationActivity.this.finish();
 		}
 	}
-
+		
 	public ReportObservation getReportObservation() {
 		return reportObservation;
 	}
@@ -411,6 +424,13 @@ public class ReportObservationActivity extends Activity {
 
 	public void setSpinnerInit(boolean spinnerInit) {
 		this.spinnerInit = spinnerInit;
+	}
+	
+	@Override
+	protected void onStop() {
+		dialogProgress.dismiss();
+		dialogLogin.dismiss();
+		super.onStop();
 	}
 
 }

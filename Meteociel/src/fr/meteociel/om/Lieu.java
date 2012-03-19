@@ -9,12 +9,12 @@ public class Lieu {
 	/**
 	 * Ville de l'observation
 	 */
-	private String ville;
+	private String ville = "";
 	
 	/**
 	 * Altitude de l'observation
 	 */
-	private String altitude;
+	private String altitude = "";
 
 	public String getVille() {
 		return ville;
