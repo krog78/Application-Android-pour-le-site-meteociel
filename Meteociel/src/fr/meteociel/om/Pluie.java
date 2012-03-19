@@ -1,11 +1,13 @@
 package fr.meteociel.om;
 
+import fr.meteociel.util.TypeChampSupp;
+
 /**
  * Report de pluie
  * @author ippon
  *
  */
-public class Pluie extends ReportObservation{
+public class Pluie extends ReportObservation implements IReportObservation{
 
 	/**
 	 * Hauteur de pluie en mm
@@ -23,6 +25,10 @@ public class Pluie extends ReportObservation{
 
 	public void setHauteur(String hauteur) {
 		this.hauteur = hauteur;
+	}
+	
+	public TypeChampSupp getTypeChampSupp() {
+		return TypeChampSupp.PLUIE_MM;
 	}
 	
 }

@@ -1,11 +1,13 @@
 package fr.meteociel.om;
 
+import fr.meteociel.util.TypeChampSupp;
+
 /**
  * Report de température
  * @author ippon
  *
  */
-public class Temperature extends ReportObservation{
+public class Temperature extends ReportObservation implements IReportObservation{
 
 	/**
 	 * Température en degrés
@@ -25,6 +27,8 @@ public class Temperature extends ReportObservation{
 		this.degres = degres;
 	}
 
-	
+	public TypeChampSupp getTypeChampSupp() {
+		return TypeChampSupp.TEMPERATURE;
+	}
 	
 }

@@ -6,5 +6,6 @@ package fr.meteociel.util;
  *
  */
 public enum TypeChampSupp {
-	VENT, PLUIE_MM, NEIGE_CM, GRESIL_MM, TEMPERATURE, VISIBILITE;
+	AUTRE, VENT, PLUIE_MM, NEIGE_CM, GRESIL_MM, TEMPERATURE, VISIBILITE;	
+	
 }

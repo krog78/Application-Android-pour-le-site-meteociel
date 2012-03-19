@@ -1,11 +1,13 @@
 package fr.meteociel.om;
 
+import fr.meteociel.util.TypeChampSupp;
+
 /**
  * Report de neige
  * @author ippon
  *
  */
-public class Neige extends ReportObservation{
+public class Neige extends ReportObservation implements IReportObservation{
 
 	/**
 	 * Hauteur de neige en cm
@@ -23,6 +25,10 @@ public class Neige extends ReportObservation{
 
 	public void setHauteur(String hauteur) {
 		this.hauteur = hauteur;
+	}
+	
+	public TypeChampSupp getTypeChampSupp() {
+		return TypeChampSupp.NEIGE_CM;
 	}
 	
 }

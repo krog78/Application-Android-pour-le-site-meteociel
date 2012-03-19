@@ -1,11 +1,13 @@
 package fr.meteociel.om;
 
+import fr.meteociel.util.TypeChampSupp;
+
 /**
  * Report de visibilité
  * @author ippon
  *
  */
-public class Visibilite extends ReportObservation{
+public class Visibilite extends ReportObservation implements IReportObservation{
 
 	/**
 	 * Visibilité en mètres
@@ -25,7 +27,9 @@ public class Visibilite extends ReportObservation{
 		this.longueur = longueur;
 	}
 
-	
+	public TypeChampSupp getTypeChampSupp() {
+		return TypeChampSupp.VISIBILITE;
+	}
 
 	
 	

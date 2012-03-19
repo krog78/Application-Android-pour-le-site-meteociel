@@ -1,5 +1,6 @@
 package fr.meteociel.om;
 
+import fr.meteociel.util.TypeChampSupp;
 import android.net.Uri;
 
 /**
@@ -7,7 +8,7 @@ import android.net.Uri;
  * @author A512568
  *
  */
-public class ReportObservation {
+public class ReportObservation implements IReportObservation{
 	
 	public ReportObservation() {
 		super();
@@ -127,6 +128,11 @@ public class ReportObservation {
 		this.value = obs.value;
 		this.imageUri = obs.imageUri;
 		this.pathImage = obs.pathImage;
+	}
+
+	@Override
+	public TypeChampSupp getTypeChampSupp() {
+		return TypeChampSupp.AUTRE;
 	}
 
 

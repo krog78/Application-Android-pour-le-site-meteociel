@@ -1,12 +1,14 @@
 package fr.meteociel.om;
 
+import fr.meteociel.util.TypeChampSupp;
+
 /**
  * Report de vent
  * 
  * @author ippon
  * 
  */
-public class Vent extends ReportObservation {
+public class Vent extends ReportObservation implements IReportObservation{
 
 	public Vent(ReportObservation obs, String vitesse, String direction) {
 		super(obs);
@@ -38,5 +40,9 @@ public class Vent extends ReportObservation {
 
 	public void setDirection(String direction) {
 		this.direction = direction;
+	}
+	
+	public TypeChampSupp getTypeChampSupp() {
+		return TypeChampSupp.VENT;
 	}
 }
