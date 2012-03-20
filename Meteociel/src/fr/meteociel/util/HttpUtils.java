@@ -265,7 +265,9 @@ public class HttpUtils {
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
+			if(activity.getAsyncTask() != null) activity.getAsyncTask().cancel(true);
 			activity.showConnectionError();
+			
 		}
 	}
 

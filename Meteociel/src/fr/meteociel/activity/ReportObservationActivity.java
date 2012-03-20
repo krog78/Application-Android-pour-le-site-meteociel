@@ -45,7 +45,6 @@ import fr.meteociel.util.MeteocielUtils;
  */
 public class ReportObservationActivity extends AbstractMeteocielActivity {
 
-	
 	/**
 	 * Préférences de l'appli météociel
 	 */
@@ -76,11 +75,6 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 	 */
 	private ReportObservation reportObservation = new ReportObservation();
 
-	/**
-	 * Tache de fond d'envoi de l'observation
-	 */
-	private EnvoiObservationTask envoiObservationTask = new EnvoiObservationTask();
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -133,9 +127,9 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 				} else {
 					reportObservation.setUser(login);
 					reportObservation.setPassword(password);
-					
-					
-					envoiObservationTask.execute(reportObservation);
+
+					asyncTask = new EnvoiObservationTask();
+					asyncTask.execute(reportObservation);
 				}
 
 			}
@@ -214,7 +208,8 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 				// Commit the edits!
 				editor.commit();
 
-				envoiObservationTask.execute(reportObservation);
+				asyncTask = new EnvoiObservationTask();
+				asyncTask.execute(reportObservation);
 
 			}
 		});
@@ -381,17 +376,16 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			ReportObservationActivity.this.runOnUiThread(new Runnable() {
-				
+
 				@Override
 				public void run() {
-					dialogProgress = ProgressDialog.show(ReportObservationActivity.this, "",
+					dialogProgress = ProgressDialog.show(
+							ReportObservationActivity.this, "",
 							getString(R.string.envoi), true);
-					
+
 				}
 			});
-			
-			
-			
+
 		}
 
 		@Override
@@ -404,24 +398,37 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
+
+			if (!this.isCancelled()) { // On n'a pas cancellé la tache sur une erreur
+				ReportObservationActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						dialogProgress.dismiss();
+						Toast toast = Toast.makeText(
+								ReportObservationActivity.this
+										.getApplicationContext(),
+								R.string.report_effectue, 1);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
+
+					}
+				});
+				ReportObservationActivity.this.finish();
+			}else{
+				ReportObservationActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						dialogProgress.dismiss();
+					}
+				});
+			}
+
 			
-			ReportObservationActivity.this.runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					dialogProgress.dismiss();
-					Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
-							R.string.report_effectue, 1);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
-					
-				}
-			});
-						
-			ReportObservationActivity.this.finish();
 		}
 	}
-		
+
 	public ReportObservation getReportObservation() {
 		return reportObservation;
 	}
@@ -437,7 +444,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 	public void setSpinnerInit(boolean spinnerInit) {
 		this.spinnerInit = spinnerInit;
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
