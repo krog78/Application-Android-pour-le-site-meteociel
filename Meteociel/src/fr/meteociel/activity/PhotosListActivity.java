@@ -45,7 +45,6 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -58,13 +57,12 @@ import android.widget.ListView;
 import fr.meteociel.R;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
-import fr.meteociel.util.HttpUtils;
 
 /**
  * This activity uses a custom cursor adapter which fetches a XML photo feed and
  * parses the XML to extract the images' URL and their title.
  */
-public class PhotosListActivity extends Activity {
+public class PhotosListActivity extends AbstractMeteocielActivity {
 	private static final String METEOCIEL_FEED_URL = "http://www.meteociel.fr/user/day-gallery.php";
 
 	
@@ -237,7 +235,7 @@ public class PhotosListActivity extends Activity {
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
 			if(result == 1){
-				HttpUtils.showConnectionError(PhotosListActivity.this);		
+				showConnectionError();		
 			}
 			list = (ListView) findViewById(R.id.list);
 			adapter = new LazyAdapter(PhotosListActivity.this,

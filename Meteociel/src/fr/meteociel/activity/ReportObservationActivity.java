@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -44,12 +43,8 @@ import fr.meteociel.util.MeteocielUtils;
  * @author A512568
  * 
  */
-public class ReportObservationActivity extends Activity {
+public class ReportObservationActivity extends AbstractMeteocielActivity {
 
-	
-	protected ProgressDialog dialogProgress;
-	
-	protected Dialog dialogLogin;
 	
 	/**
 	 * Préférences de l'appli météociel
@@ -133,14 +128,13 @@ public class ReportObservationActivity extends Activity {
 
 				if (login.isEmpty() || password.isEmpty()) {
 					// Boite de dialogue login
-					dialogLogin = creerDialogLogin();
+					Dialog dialogLogin = creerDialogLogin();
 					dialogLogin.show();
 				} else {
 					reportObservation.setUser(login);
 					reportObservation.setPassword(password);
 					
-					dialogProgress = ProgressDialog.show(ReportObservationActivity.this, "",
-							getString(R.string.envoi), true);
+					
 					envoiObservationTask.execute(reportObservation);
 				}
 
@@ -220,8 +214,6 @@ public class ReportObservationActivity extends Activity {
 				// Commit the edits!
 				editor.commit();
 
-				dialogProgress = ProgressDialog.show(ReportObservationActivity.this, "",
-						getString(R.string.envoi), true);
 				envoiObservationTask.execute(reportObservation);
 
 			}
@@ -383,12 +375,23 @@ public class ReportObservationActivity extends Activity {
 	private class EnvoiObservationTask extends
 			AsyncTask<ReportObservation, Integer, Long> {
 
-		
+		ProgressDialog dialogProgress;
 
 		@Override
 		protected void onPreExecute() {
-			
 			super.onPreExecute();
+			ReportObservationActivity.this.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					dialogProgress = ProgressDialog.show(ReportObservationActivity.this, "",
+							getString(R.string.envoi), true);
+					
+				}
+			});
+			
+			
+			
 		}
 
 		@Override
@@ -401,11 +404,20 @@ public class ReportObservationActivity extends Activity {
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
-			dialogProgress.dismiss();
-			Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
-					R.string.report_effectue, 1);
-			toast.setGravity(Gravity.CENTER, 0, 0);
-			toast.show();
+			
+			ReportObservationActivity.this.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					dialogProgress.dismiss();
+					Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
+							R.string.report_effectue, 1);
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+					
+				}
+			});
+						
 			ReportObservationActivity.this.finish();
 		}
 	}
@@ -428,8 +440,6 @@ public class ReportObservationActivity extends Activity {
 	
 	@Override
 	protected void onStop() {
-		dialogProgress.dismiss();
-		dialogLogin.dismiss();
 		super.onStop();
 	}
 

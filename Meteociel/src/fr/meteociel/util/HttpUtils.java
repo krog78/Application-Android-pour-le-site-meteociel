@@ -29,6 +29,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import fr.meteociel.R;
+import fr.meteociel.activity.AbstractMeteocielActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -179,15 +180,15 @@ public class HttpUtils {
 				htmlResponse.append(line);
 			}
 
-			try {
-				File c = new File("/sdcard/test.html");
-
-				BufferedWriter out = new BufferedWriter(new FileWriter(c));
-				out.write(htmlResponse.toString());
-				out.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+//			try {
+//				File c = new File("/sdcard/test.html");
+//
+//				BufferedWriter out = new BufferedWriter(new FileWriter(c));
+//				out.write(htmlResponse.toString());
+//				out.close();
+//			} catch (IOException e) {
+//				throw new RuntimeException(e);
+//			}
 
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
@@ -203,7 +204,7 @@ public class HttpUtils {
 	 * @param url
 	 *            l'url à appeler
 	 */
-	public static final HttpResponse getRequest(Activity activity, String url) {
+	public static final HttpResponse getRequest(AbstractMeteocielActivity activity, String url) {
 		HttpGet httpGet = new HttpGet(url);
 		HttpResponse httpResponse = null;
 		try {
@@ -212,7 +213,7 @@ public class HttpUtils {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			e.printStackTrace();
-			showConnectionError(activity);
+			activity.showConnectionError();
 		}
 		return httpResponse;
 
@@ -228,7 +229,7 @@ public class HttpUtils {
 	 * @param httpPost
 	 * 
 	 */
-	public static final void postRequest(Activity activity, String url,
+	public static final void postRequest(AbstractMeteocielActivity activity, String url,
 			List<NameValuePair> params) {
 
 		// DEBUT Proxy pour chez Atos
@@ -251,39 +252,24 @@ public class HttpUtils {
 		try {
 			HttpResponse response = httpClient.execute(httpPost, localContext);
 			
-			try {
-				File c = new File("/sdcard/test.html");
-
-				BufferedWriter out = new BufferedWriter(new FileWriter(c));
-				out.write(httpResponseToString(response));
-				out.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+//			try {
+//				File c = new File("/sdcard/test.html");
+//
+//				BufferedWriter out = new BufferedWriter(new FileWriter(c));
+//				out.write(httpResponseToString(response));
+//				out.close();
+//			} catch (IOException e) {
+//				throw new RuntimeException(e);
+//			}
 
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
-			showConnectionError(activity);
+			activity.showConnectionError();
 		}
 	}
 
-	/**
-	 * Affiche une alerte sur une erreur de connection
-	 * 
-	 * @param activity
-	 */
-	public static final void showConnectionError(final Activity activity) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		builder.setMessage(R.string.erreur_connexion).setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						activity.finish();
-					}
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
+	
 
 	/**
 	 * Récupère la chaine de la réponse Http

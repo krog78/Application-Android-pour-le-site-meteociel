@@ -10,7 +10,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -23,6 +22,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import fr.meteociel.R;
+import fr.meteociel.activity.AbstractMeteocielActivity;
 import fr.meteociel.activity.ReportObservationActivity;
 import fr.meteociel.om.Gresil;
 import fr.meteociel.om.Neige;
@@ -62,7 +62,7 @@ public class MeteocielUtils {
 	 * @param reportObservation
 	 *            le report d'observation à soumettre
 	 */
-	public static final void soumettreFormulaireMeteociel(Activity activity,
+	public static final void soumettreFormulaireMeteociel(AbstractMeteocielActivity activity,
 			ReportObservation reportObservation) {
 
 		loginMeteociel(activity, reportObservation);
@@ -152,7 +152,7 @@ public class MeteocielUtils {
 	/**
 	 * Méthode de récupération du dernier image id posté
 	 */
-	public static final String getImageIdMeteociel(Activity activity) {
+	public static final String getImageIdMeteociel(AbstractMeteocielActivity activity) {
 		String url = "http://www.meteociel.fr/temps-reel/selectimage.php";
 
 		HttpResponse response = HttpUtils.getRequest(activity, url);
@@ -168,7 +168,7 @@ public class MeteocielUtils {
 	 * @param reportObservation
 	 *            le report de l'observation
 	 */
-	public static final void loginMeteociel(Activity activity,
+	public static final void loginMeteociel(AbstractMeteocielActivity activity,
 			ReportObservation reportObservation) {
 
 		String url = "http://www.meteociel.fr/connexion.php";
