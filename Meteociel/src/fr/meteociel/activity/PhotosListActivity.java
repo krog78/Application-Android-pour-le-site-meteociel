@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -152,19 +153,18 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 				@Override
 				public void run() {
 					// Chargement de l'image en grand dans un nouveau dialog
-					ImageLoader imageLoader = new ImageLoader(
-							PhotosListActivity.this.getApplicationContext());
-					imageLoader.setRequiredSize(-1);
 					final Dialog dialog = new Dialog(PhotosListActivity.this);
 
 					int position = (Integer)obj[0];
 					
 					dialog.setContentView(R.layout.big_image);
 
-					ImageView image = (ImageView) dialog.findViewById(R.id.big_image);
-
-					image.setImageBitmap(imageLoader.getBitmap(listeObservations.get(
-							position).getUrlBigImage()));
+					WebView image = (WebView) dialog.findViewById(R.id.big_image);
+					image.getSettings().setLoadWithOverviewMode(true);
+					image.getSettings().setUseWideViewPort(true);
+					
+					image.loadUrl(listeObservations.get(
+							position).getUrlBigImage());
 
 					Button closeButton = (Button) dialog.findViewById(R.id.close);
 					closeButton.setOnClickListener(new View.OnClickListener() {
@@ -197,59 +197,7 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
-			if (result == 1) {
-				showConnectionError();
-			}
-			list = (ListView) findViewById(R.id.list_reports);
-			adapter = new LazyAdapter(PhotosListActivity.this,
-					listeObservations.toArray(new Observation[listeObservations
-							.size()]));
-			list.setAdapter(adapter);
-
-			// Gestion du click sur un item
-			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				public void onItemClick(AdapterView parentView, View childView,
-						int position, long id) {
-
-					// Chargement de l'image en grand dans un nouveau dialog
-					ImageLoader imageLoader = new ImageLoader(
-							PhotosListActivity.this.getApplicationContext());
-					imageLoader.setRequiredSize(-1);
-					final Dialog dialog = new Dialog(PhotosListActivity.this);
-
-					dialog.setContentView(R.layout.big_image);
-
-					ImageView image = (ImageView) dialog
-							.findViewById(R.id.big_image);
-
-					image.setImageBitmap(imageLoader
-							.getBitmap(listeObservations.get(position)
-									.getUrlBigImage()));
-
-					Button closeButton = (Button) dialog
-							.findViewById(R.id.close);
-					closeButton.setOnClickListener(new View.OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							dialog.dismiss();
-						}
-					});
-
-					// Libellé de l'image
-					TextView titre = (TextView) dialog.findViewById(R.id.titre);
-					titre.setText(listeObservations.get(position).getTitre());
-
-					TextView description = (TextView) dialog
-							.findViewById(R.id.description);
-					description.setText(listeObservations.get(position)
-							.getTexte());
-
-					dialog.show();
-
-				}
-			});
-
+			
 			dialog.dismiss();
 		}
 	}
