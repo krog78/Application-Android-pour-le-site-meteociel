@@ -8,11 +8,12 @@ package fr.meteociel.om;
  */
 public class Observation {
 
-	public Observation(String titre, String texte, String url) {
+	public Observation(String titre, String texte, String url, String urlBigImage) {
 		super();
 		this.titre = titre;
 		this.texte = texte;
 		this.urlImage = url;
+		this.urlBigImage = urlBigImage;
 	}
 
 	/**
@@ -29,6 +30,11 @@ public class Observation {
 	 * Url de l'image
 	 */
 	private String urlImage;
+
+	/**
+	 * Url de l'image big
+	 */
+	private String urlBigImage;
 
 	public String getTexte() {
 		return texte;
@@ -52,6 +58,14 @@ public class Observation {
 
 	public void setTitre(String titre) {
 		this.titre = titre;
+	}
+
+	public String getUrlBigImage() {
+		return urlBigImage;
+	}
+
+	public void setUrlBigImage(String urlBigImage) {
+		this.urlBigImage = urlBigImage;
 	}
 
 }

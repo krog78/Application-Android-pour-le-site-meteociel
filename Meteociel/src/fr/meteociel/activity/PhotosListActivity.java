@@ -16,64 +16,42 @@
 
 package fr.meteociel.activity;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.ccil.cowan.tagsoup.Parser;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
-import org.xml.sax.XMLReader;
-
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import fr.meteociel.R;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
+import fr.meteociel.util.ImageLoader;
+import fr.meteociel.util.MeteocielUtils;
 
 /**
  * This activity uses a custom cursor adapter which fetches a XML photo feed and
  * parses the XML to extract the images' URL and their title.
  */
 public class PhotosListActivity extends AbstractMeteocielActivity {
-	private static final String METEOCIEL_FEED_URL = "http://www.meteociel.fr/user/day-gallery.php";
 
-	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		new AfficherObservationsTask().execute();
-		
+
 	}
 
 	@Override
@@ -110,140 +88,178 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 	ListView list;
 	LazyAdapter adapter;
 	List<Observation> listeObservations = new ArrayList<Observation>();
-	
 
-	private class AfficherObservationsTask extends AsyncTask<Object, Integer, Long> {
+	private class AfficherObservationsTask extends
+			AsyncTask<Object, Integer, Long> {
 
 		private ProgressDialog dialog;
-		
+
 		@Override
 		protected void onPreExecute() {
 			dialog = ProgressDialog.show(PhotosListActivity.this, "",
 					getString(R.string.chargement), true);
 			super.onPreExecute();
 		}
-		
+
 		@Override
 		protected Long doInBackground(Object... obj) {
-			URL url = null;
-			try {
-				url = new URL(PhotosListActivity.METEOCIEL_FEED_URL);
-			} catch (MalformedURLException e1) {
-				throw new RuntimeException(e1);
-			}
-			XMLReader reader = new Parser();
-			try {
-				reader.setFeature(Parser.namespacesFeature, false);
-			} catch (SAXNotRecognizedException e1) {
-				throw new RuntimeException(e1);
-			} catch (SAXNotSupportedException e1) {
-				throw new RuntimeException(e1);
-			}
-			try {
-				reader.setFeature(Parser.namespacePrefixesFeature, false);
-			} catch (SAXNotRecognizedException e1) {
-				throw new RuntimeException(e1);
-			} catch (SAXNotSupportedException e1) {
-				throw new RuntimeException(e1);
-			}
+			return MeteocielUtils.parseHtmlMeteociel(PhotosListActivity.this);
 
-			Transformer transformer;
-			try {
-				transformer = TransformerFactory.newInstance()
-						.newTransformer();
-			} catch (TransformerConfigurationException e1) {
-				throw new RuntimeException(e1);
-			} catch (TransformerFactoryConfigurationError e1) {
-				throw new RuntimeException(e1);
-			}
-
-			DOMResult result = new DOMResult();
-
-			try {
-				InputStream is = url.openStream();
-				try {
-					transformer.transform(new SAXSource(reader,
-							new InputSource(is)), result);
-				} catch (TransformerException e1) {
-					throw new RuntimeException(e1);
-				}
-
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				return new Long(1);	
-			}
-
-			XPathFactory xpf = XPathFactory.newInstance();
-			XPath xpath = xpf.newXPath();
-
-			
-			try {
-				NodeList nodeList = (NodeList) xpath.evaluate("//img",
-						result.getNode(), XPathConstants.NODESET);
-				for (int i = 0; i < nodeList.getLength(); i++) {
-					Node node = nodeList.item(i);
-					NamedNodeMap nodeMap = node.getAttributes();
-
-					// Récupération de l'url de l'image source
-					Node nodeSrc = nodeMap.getNamedItem("src");
-					String src = nodeSrc.getNodeValue();
-
-					if (src.contains("images.meteociel.fr")) {
-						// Récupération du commentaire
-						Node nodeCom = nodeMap.getNamedItem("onmouseover");
-						String commentaire = nodeCom.getNodeValue();
-						String date = commentaire.substring(
-								commentaire.indexOf("('") + 2,
-								commentaire.indexOf("',"));
-						String[] tokens = commentaire.split(",'");
-						String strFormat = tokens[1].substring(0,
-								tokens[1].length() - 1);
-
-						String titre = strFormat.substring(0,
-								strFormat.indexOf("<hr>"));
-						String user = strFormat.substring(
-								strFormat.indexOf("<hr>"),
-								strFormat.indexOf("<br>"));
-						String corps = strFormat.substring(
-								strFormat.indexOf("<br>"),
-								strFormat.length());
-
-						CharSequence styledTitre = Html.fromHtml(titre
-								+ " - " + date + " - " + user);
-
-						CharSequence styledText = Html.fromHtml(corps);
-
-						Observation o = new Observation(
-								StringEscapeUtils.unescapeJavaScript(StringEscapeUtils
-										.unescapeHtml(styledTitre
-												.toString())),
-								StringEscapeUtils
-										.unescapeJavaScript(StringEscapeUtils
-												.unescapeHtml(styledText
-														.toString())), src);
-						listeObservations.add(o);
-
-					}
-				}
-			} catch (XPathExpressionException e) {
-				throw new RuntimeException(e);
-			}
-			return new Long(0);
 		}
-		
+
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
-			if(result == 1){
-				showConnectionError();		
+			if (result == 1) {
+				showConnectionError();
 			}
-			list = (ListView) findViewById(R.id.list);
+			list = (ListView) findViewById(R.id.list_reports);
 			adapter = new LazyAdapter(PhotosListActivity.this,
 					listeObservations.toArray(new Observation[listeObservations
 							.size()]));
 			list.setAdapter(adapter);
+
+			// Gestion du click sur un item
+			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				public void onItemClick(AdapterView parentView, View childView,
+						int position, long id) {
+
+					// Appel de la tache de fond pour charger l'observation
+					new RechercherObservationsTask().execute(position);
+				}
+			});
 			dialog.dismiss();
 		}
 	}
-	
+
+	private class RechercherObservationsTask extends
+			AsyncTask<Object, Integer, Long> {
+
+		private ProgressDialog dialog;
+
+		@Override
+		protected void onPreExecute() {
+			dialog = ProgressDialog.show(PhotosListActivity.this, "",
+					getString(R.string.chargement), true);
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Long doInBackground(final Object... obj) {
+
+			PhotosListActivity.this.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					// Chargement de l'image en grand dans un nouveau dialog
+					ImageLoader imageLoader = new ImageLoader(
+							PhotosListActivity.this.getApplicationContext());
+					imageLoader.setRequiredSize(-1);
+					final Dialog dialog = new Dialog(PhotosListActivity.this);
+
+					int position = (Integer)obj[0];
+					
+					dialog.setContentView(R.layout.big_image);
+
+					ImageView image = (ImageView) dialog.findViewById(R.id.big_image);
+
+					image.setImageBitmap(imageLoader.getBitmap(listeObservations.get(
+							position).getUrlBigImage()));
+
+					Button closeButton = (Button) dialog.findViewById(R.id.close);
+					closeButton.setOnClickListener(new View.OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+
+					// Libellé de l'image
+					TextView titre = (TextView) dialog.findViewById(R.id.titre);
+					titre.setText(listeObservations.get(position).getTitre());
+
+					TextView description = (TextView) dialog
+							.findViewById(R.id.description);
+					description.setText(listeObservations.get(position).getTexte());
+
+					dialog.show();
+					
+				}
+			});
+			
+			
+
+			return new Long(0);
+
+		}
+
+		@Override
+		protected void onPostExecute(Long result) {
+			super.onPostExecute(result);
+			if (result == 1) {
+				showConnectionError();
+			}
+			list = (ListView) findViewById(R.id.list_reports);
+			adapter = new LazyAdapter(PhotosListActivity.this,
+					listeObservations.toArray(new Observation[listeObservations
+							.size()]));
+			list.setAdapter(adapter);
+
+			// Gestion du click sur un item
+			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				public void onItemClick(AdapterView parentView, View childView,
+						int position, long id) {
+
+					// Chargement de l'image en grand dans un nouveau dialog
+					ImageLoader imageLoader = new ImageLoader(
+							PhotosListActivity.this.getApplicationContext());
+					imageLoader.setRequiredSize(-1);
+					final Dialog dialog = new Dialog(PhotosListActivity.this);
+
+					dialog.setContentView(R.layout.big_image);
+
+					ImageView image = (ImageView) dialog
+							.findViewById(R.id.big_image);
+
+					image.setImageBitmap(imageLoader
+							.getBitmap(listeObservations.get(position)
+									.getUrlBigImage()));
+
+					Button closeButton = (Button) dialog
+							.findViewById(R.id.close);
+					closeButton.setOnClickListener(new View.OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+
+					// Libellé de l'image
+					TextView titre = (TextView) dialog.findViewById(R.id.titre);
+					titre.setText(listeObservations.get(position).getTitre());
+
+					TextView description = (TextView) dialog
+							.findViewById(R.id.description);
+					description.setText(listeObservations.get(position)
+							.getTexte());
+
+					dialog.show();
+
+				}
+			});
+
+			dialog.dismiss();
+		}
+	}
+
+	public List<Observation> getListeObservations() {
+		return listeObservations;
+	}
+
+	public void setListeObservations(List<Observation> listeObservations) {
+		this.listeObservations = listeObservations;
+	}
+
 }

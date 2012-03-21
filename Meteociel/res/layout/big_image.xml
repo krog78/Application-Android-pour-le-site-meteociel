@@ -1,0 +1,52 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center|center_horizontal"
+    android:padding="10dp" >
+
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_root"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" >
+
+        <TableRow
+            android:layout_gravity="center" >
+
+            <ImageView
+                android:id="@+id/big_image"
+                android:layout_width="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/image_selectionnee"
+                android:src="@drawable/webcambadalonallefia_dpf0" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/titre"
+                android:width="0dip" 
+                android:textStyle="bold"/>
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/description"
+                android:width="0dip" />
+        </TableRow>
+
+        <TableRow android:layout_gravity="center" >
+
+            <Button
+                android:id="@+id/close"
+                android:text="@string/close"
+                android:paddingTop="20dp" />
+        </TableRow>
+    </TableLayout>
+
+</ScrollView>

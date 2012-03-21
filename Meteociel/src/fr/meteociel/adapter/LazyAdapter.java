@@ -50,4 +50,5 @@ public class LazyAdapter extends BaseAdapter {
 		imageLoader.DisplayImage(observations[position].getUrlImage(), image);
         return vi;
     }
+    
 }

@@ -25,6 +25,9 @@ public class ImageLoader {
 
 	MemoryCache memoryCache = new MemoryCache();
 	FileCache fileCache;
+
+	private int requiredSize = 70;
+
 	private Map<ImageView, String> imageViews = Collections
 			.synchronizedMap(new WeakHashMap<ImageView, String>());
 	ExecutorService executorService;
@@ -52,7 +55,7 @@ public class ImageLoader {
 		executorService.submit(new PhotosLoader(p));
 	}
 
-	private Bitmap getBitmap(String url) {
+	public Bitmap getBitmap(String url) {
 		File f = fileCache.getFile(url);
 
 		// from SD cache
@@ -84,28 +87,35 @@ public class ImageLoader {
 	// decodes image and scales it to reduce memory consumption
 	private Bitmap decodeFile(File f) {
 		try {
-			// decode image size
-			BitmapFactory.Options o = new BitmapFactory.Options();
-			o.inJustDecodeBounds = true;
-			BitmapFactory.decodeStream(new FileInputStream(f), null, o);
+			if (requiredSize > 0) {
+				// decode image size
+				BitmapFactory.Options o = new BitmapFactory.Options();
+				o.inJustDecodeBounds = true;
+				BitmapFactory.decodeStream(new FileInputStream(f), null, o);
 
-			// Find the correct scale value. It should be the power of 2.
-			final int REQUIRED_SIZE = 70;
-			int width_tmp = o.outWidth, height_tmp = o.outHeight;
-			int scale = 1;
-			while (true) {
-				if (width_tmp / 2 < REQUIRED_SIZE
-						|| height_tmp / 2 < REQUIRED_SIZE)
-					break;
-				width_tmp /= 2;
-				height_tmp /= 2;
-				scale *= 2;
+				// Find the correct scale value. It should be the power of 2.
+
+				int width_tmp = o.outWidth, height_tmp = o.outHeight;
+				int scale = 1;
+				while (true) {
+					if (width_tmp / 2 < requiredSize
+							|| height_tmp / 2 < requiredSize)
+						break;
+					width_tmp /= 2;
+					height_tmp /= 2;
+					scale *= 2;
+				}
+
+				// decode with inSampleSize
+				BitmapFactory.Options o2 = new BitmapFactory.Options();
+				o2.inSampleSize = scale;
+				return BitmapFactory.decodeStream(new FileInputStream(f), null,
+						o2);
+			} else {
+				BitmapFactory.Options o2 = new BitmapFactory.Options();
+				return BitmapFactory.decodeStream(new FileInputStream(f), null,
+						o2);
 			}
-
-			// decode with inSampleSize
-			BitmapFactory.Options o2 = new BitmapFactory.Options();
-			o2.inSampleSize = scale;
-			return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
 		} catch (FileNotFoundException e) {
 		}
 		return null;
@@ -173,6 +183,14 @@ public class ImageLoader {
 	public void clearCache() {
 		memoryCache.clear();
 		fileCache.clear();
+	}
+
+	public int getRequiredSize() {
+		return requiredSize;
+	}
+
+	public void setRequiredSize(int requiredSize) {
+		this.requiredSize = requiredSize;
 	}
 
 }

@@ -27,4 +27,5 @@
     <string name="ville">Ville:</string>
     <string name="altitude">Altitude:</string>
     <string name="metre">m</string>
+    <string name="close">Fermer</string>
 </resources>

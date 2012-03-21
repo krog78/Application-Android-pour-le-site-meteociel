@@ -1,18 +1,44 @@
 package fr.meteociel.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.ccil.cowan.tagsoup.Parser;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,9 +49,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import fr.meteociel.R;
 import fr.meteociel.activity.AbstractMeteocielActivity;
+import fr.meteociel.activity.PhotosListActivity;
 import fr.meteociel.activity.ReportObservationActivity;
 import fr.meteociel.om.Gresil;
 import fr.meteociel.om.Neige;
+import fr.meteociel.om.Observation;
 import fr.meteociel.om.Pluie;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.om.Temperature;
@@ -41,6 +69,12 @@ import fr.meteociel.om.Visibilite;
  */
 public class MeteocielUtils {
 
+	/**
+	 * URL Report Météociel
+	 */
+	private static final String METEOCIEL_FEED_URL = "http://www.meteociel.fr/user/day-gallery.php";
+
+	
 	/**
 	 * Description de l'observation
 	 */
@@ -161,7 +195,8 @@ public class MeteocielUtils {
 				"javascript:selectImage(", ",");
 		return imageid;
 	}
-
+	
+	
 	/**
 	 * Méthode de login au site météociel
 	 * 
@@ -442,6 +477,117 @@ public class MeteocielUtils {
 		spin.setAdapter(adapter);
 		spin.setSelection(19); // Sélection par défaut : Soleil
 		return spin;
+	}
+	
+	/**
+	 * Parse le code de la page html des reports Météociel
+	 * 
+	 * @return la code retour du parsing
+	 */
+	public static final long parseHtmlMeteociel(PhotosListActivity activity){
+		URL url = null;
+		try {
+			url = new URL(METEOCIEL_FEED_URL);
+		} catch (MalformedURLException e1) {
+			throw new RuntimeException(e1);
+		}
+		XMLReader reader = new Parser();
+		try {
+			reader.setFeature(Parser.namespacesFeature, false);
+		} catch (SAXNotRecognizedException e1) {
+			throw new RuntimeException(e1);
+		} catch (SAXNotSupportedException e1) {
+			throw new RuntimeException(e1);
+		}
+		try {
+			reader.setFeature(Parser.namespacePrefixesFeature, false);
+		} catch (SAXNotRecognizedException e1) {
+			throw new RuntimeException(e1);
+		} catch (SAXNotSupportedException e1) {
+			throw new RuntimeException(e1);
+		}
+
+		Transformer transformer;
+		try {
+			transformer = TransformerFactory.newInstance().newTransformer();
+		} catch (TransformerConfigurationException e1) {
+			throw new RuntimeException(e1);
+		} catch (TransformerFactoryConfigurationError e1) {
+			throw new RuntimeException(e1);
+		}
+
+		DOMResult result = new DOMResult();
+
+		try {
+			InputStream is = url.openStream();
+			try {
+				transformer.transform(new SAXSource(reader,
+						new InputSource(is)), result);
+			} catch (TransformerException e1) {
+				throw new RuntimeException(e1);
+			}
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return new Long(1);
+		}
+
+		XPathFactory xpf = XPathFactory.newInstance();
+		XPath xpath = xpf.newXPath();
+
+		try {
+			NodeList nodeList = (NodeList) xpath.evaluate("//a[@rel='shadowbox']",
+					result.getNode(), XPathConstants.NODESET);
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				Node aNode = nodeList.item(i);
+				String urlBigImage = aNode.getAttributes().getNamedItem("href").getNodeValue();
+				
+				Node node = aNode.getFirstChild();
+				NamedNodeMap nodeMap = node.getAttributes();
+
+				// Récupération de l'url de l'image source
+				Node nodeSrc = nodeMap.getNamedItem("src");
+				String src = nodeSrc.getNodeValue();
+
+				if (src.contains("images.meteociel.fr")) {
+					// Récupération du commentaire
+					Node nodeCom = nodeMap.getNamedItem("onmouseover");
+					String commentaire = nodeCom.getNodeValue();
+					String date = commentaire.substring(
+							commentaire.indexOf("('") + 2,
+							commentaire.indexOf("',"));
+					String[] tokens = commentaire.split(",'");
+					String strFormat = tokens[1].substring(0,
+							tokens[1].length() - 1);
+
+					String titre = strFormat.substring(0,
+							strFormat.indexOf("<hr>"));
+					String user = strFormat.substring(
+							strFormat.indexOf("<hr>"),
+							strFormat.indexOf("<br>"));
+					String corps = strFormat.substring(
+							strFormat.indexOf("<br>"), strFormat.length());
+
+					CharSequence styledTitre = Html.fromHtml(titre + " - "
+							+ date + " - " + user);
+
+					CharSequence styledText = Html.fromHtml(corps);
+
+					Observation o = new Observation(
+							StringEscapeUtils.unescapeJavaScript(StringEscapeUtils
+									.unescapeHtml(styledTitre.toString())),
+							StringEscapeUtils
+									.unescapeJavaScript(StringEscapeUtils
+											.unescapeHtml(styledText
+													.toString())), src, urlBigImage);
+					activity.getListeObservations().add(o);
+
+				}
+			}
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException(e);
+		}
+		return new Long(0);
 	}
 
 }
