@@ -61,6 +61,33 @@ public abstract class AbstractMeteocielActivity extends Activity {
 	}
 	
 	/**
+	 * Affiche une alerte sur un problème de soumission de formulaire
+	 * 
+	 * @param activity
+	 */
+	public final void showFormError() {
+		AbstractMeteocielActivity.this.runOnUiThread(new Runnable() {
+		    public void run() {
+		    	AlertDialog.Builder builder = new AlertDialog.Builder(AbstractMeteocielActivity.this);
+				builder.setMessage(R.string.erreur_soumission)
+						.setCancelable(false)
+						.setPositiveButton("OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										dialog.dismiss();
+									}
+								});
+				AlertDialog alertError = builder.create();
+
+				alertError.show();
+		    }
+		});
+			
+		
+	}
+	
+	/**
 	 * Teste si le réseau est disponible
 	 * @return
 	 */

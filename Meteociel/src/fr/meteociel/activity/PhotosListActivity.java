@@ -16,6 +16,7 @@
 
 package fr.meteociel.activity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import android.widget.TextView;
 import fr.meteociel.R;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
+import fr.meteociel.util.HttpUtils;
 import fr.meteociel.util.ImageLoader;
 import fr.meteociel.util.MeteocielUtils;
 
@@ -159,13 +161,15 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 					
 					dialog.setContentView(R.layout.big_image);
 
-					WebView image = (WebView) dialog.findViewById(R.id.big_image);
-					image.getSettings().setLoadWithOverviewMode(true);
-					image.getSettings().setUseWideViewPort(true);
+					ImageView image = (ImageView) dialog.findViewById(R.id.big_image);
+						
+					try {
+						image.setImageBitmap(HttpUtils.downloadFile(listeObservations.get(
+								position).getUrlBigImage()));
+					} catch (IOException e) {
+						showConnectionError();
+					}
 					
-					image.loadUrl(listeObservations.get(
-							position).getUrlBigImage());
-
 					Button closeButton = (Button) dialog.findViewById(R.id.close);
 					closeButton.setOnClickListener(new View.OnClickListener() {
 

@@ -37,6 +37,7 @@ import org.xml.sax.XMLReader;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.text.Html;
 import android.view.View;
@@ -51,6 +52,7 @@ import fr.meteociel.R;
 import fr.meteociel.activity.AbstractMeteocielActivity;
 import fr.meteociel.activity.PhotosListActivity;
 import fr.meteociel.activity.ReportObservationActivity;
+import fr.meteociel.exception.SoumissionFormulaireException;
 import fr.meteociel.om.Gresil;
 import fr.meteociel.om.Neige;
 import fr.meteociel.om.Observation;
@@ -69,6 +71,21 @@ import fr.meteociel.om.Visibilite;
  */
 public class MeteocielUtils {
 
+	/**
+	 * Préférences de l'appli météociel
+	 */
+	public static final String PREFS_NAME = "MeteocielPrefs";
+
+	/**
+	 * Préférence de login
+	 */
+	public static final String PREF_LOGIN = "login";
+
+	/**
+	 * Préférence de password
+	 */
+	public static final String PREF_PWD = "password";
+	
 	/**
 	 * URL Report Météociel
 	 */
@@ -95,9 +112,10 @@ public class MeteocielUtils {
 	 * 
 	 * @param reportObservation
 	 *            le report d'observation à soumettre
+	 * @throws SoumissionFormulaireException 
 	 */
 	public static final void soumettreFormulaireMeteociel(AbstractMeteocielActivity activity,
-			ReportObservation reportObservation) {
+			ReportObservation reportObservation) throws SoumissionFormulaireException {
 
 		loginMeteociel(activity, reportObservation);
 
@@ -202,9 +220,10 @@ public class MeteocielUtils {
 	 * 
 	 * @param reportObservation
 	 *            le report de l'observation
+	 * @throws SoumissionFormulaireException 
 	 */
 	public static final void loginMeteociel(AbstractMeteocielActivity activity,
-			ReportObservation reportObservation) {
+			ReportObservation reportObservation) throws SoumissionFormulaireException {
 
 		String url = "http://www.meteociel.fr/connexion.php";
 
@@ -216,6 +235,14 @@ public class MeteocielUtils {
 		params.add(new BasicNameValuePair("expire", "on"));
 
 		HttpUtils.postRequest(activity, url, params);
+		
+		// Ajout dans les préférences
+		SharedPreferences settings = activity.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(PREF_LOGIN, reportObservation.getUser());
+		editor.putString(PREF_PWD, reportObservation.getPassword());
+		// Commit the edits!
+		editor.commit();
 	}
 
 	/**

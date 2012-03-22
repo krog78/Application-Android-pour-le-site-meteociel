@@ -1,12 +1,14 @@
 package fr.meteociel.util;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -28,12 +30,10 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import fr.meteociel.R;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import fr.meteociel.activity.AbstractMeteocielActivity;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import fr.meteociel.exception.SoumissionFormulaireException;
 
 /**
  * Classe utilitaire pour les accès Http
@@ -180,15 +180,15 @@ public class HttpUtils {
 				htmlResponse.append(line);
 			}
 
-//			try {
-//				File c = new File("/sdcard/test.html");
-//
-//				BufferedWriter out = new BufferedWriter(new FileWriter(c));
-//				out.write(htmlResponse.toString());
-//				out.close();
-//			} catch (IOException e) {
-//				throw new RuntimeException(e);
-//			}
+			// try {
+			// File c = new File("/sdcard/test.html");
+			//
+			// BufferedWriter out = new BufferedWriter(new FileWriter(c));
+			// out.write(htmlResponse.toString());
+			// out.close();
+			// } catch (IOException e) {
+			// throw new RuntimeException(e);
+			// }
 
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
@@ -204,7 +204,8 @@ public class HttpUtils {
 	 * @param url
 	 *            l'url à appeler
 	 */
-	public static final HttpResponse getRequest(AbstractMeteocielActivity activity, String url) {
+	public static final HttpResponse getRequest(
+			AbstractMeteocielActivity activity, String url) {
 		HttpGet httpGet = new HttpGet(url);
 		HttpResponse httpResponse = null;
 		try {
@@ -227,10 +228,11 @@ public class HttpUtils {
 	 * @param params
 	 *            les paramètres à poster
 	 * @param httpPost
+	 * @throws SoumissionFormulaireException 
 	 * 
 	 */
-	public static final void postRequest(AbstractMeteocielActivity activity, String url,
-			List<NameValuePair> params) {
+	public static final void postRequest(AbstractMeteocielActivity activity,
+			String url, List<NameValuePair> params) throws SoumissionFormulaireException {
 
 		// DEBUT Proxy pour chez Atos
 		// HttpHost proxy = new HttpHost("80.78.6.10", 8080);
@@ -251,27 +253,63 @@ public class HttpUtils {
 
 		try {
 			HttpResponse response = httpClient.execute(httpPost, localContext);
-			
-//			try {
-//				File c = new File("/sdcard/test.html");
-//
-//				BufferedWriter out = new BufferedWriter(new FileWriter(c));
-//				out.write(httpResponseToString(response));
-//				out.close();
-//			} catch (IOException e) {
-//				throw new RuntimeException(e);
-//			}
+			traiterRetourRequete(httpResponseToString(response));
+			// try {
+			// File c = new File("/sdcard/test.html");
+			//
+			// BufferedWriter out = new BufferedWriter(new FileWriter(c));
+			// out.write(httpResponseToString(response));
+			// out.close();
+			// } catch (IOException e) {
+			// throw new RuntimeException(e);
+			// }
 
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
-			if(activity.getAsyncTask() != null) activity.getAsyncTask().cancel(true);
+			if (activity.getAsyncTask() != null)
+				activity.getAsyncTask().cancel(true);
 			activity.showConnectionError();
-			
+
 		}
 	}
-
 	
+	/**
+	 * Méthode traitant le retour de la réponse http
+	 * @param response la réponse http
+	 * @throws SoumissionFormulaireException
+	 */
+	private static final void traiterRetourRequete(String response) throws SoumissionFormulaireException{
+		if(response.toLowerCase().contains("incorrects") ||
+				response.toLowerCase().contains("probl")){
+			throw new SoumissionFormulaireException();
+		}		
+	}
+
+	/**
+	 * Télécharge un fichier à l'url donnée
+	 * @param fileUrl l'url du fichier
+	 * @return l'image au format Bitmap
+	 * @throws IOException
+	 */
+	public static final Bitmap downloadFile(String fileUrl) throws IOException {
+
+		URL myFileUrl = null;
+		try {
+			myFileUrl = new URL(fileUrl);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
+		conn.setDoInput(true);
+		conn.connect();
+		InputStream is = conn.getInputStream();
+
+		return BitmapFactory.decodeStream(is);
+
+	}
 
 	/**
 	 * Récupère la chaine de la réponse Http

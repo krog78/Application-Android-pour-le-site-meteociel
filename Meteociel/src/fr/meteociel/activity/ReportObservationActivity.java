@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.meteociel.R;
+import fr.meteociel.exception.SoumissionFormulaireException;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.MeteocielUtils;
 
@@ -45,20 +46,7 @@ import fr.meteociel.util.MeteocielUtils;
  */
 public class ReportObservationActivity extends AbstractMeteocielActivity {
 
-	/**
-	 * Préférences de l'appli météociel
-	 */
-	public static final String PREFS_NAME = "MeteocielPrefs";
 
-	/**
-	 * Préférence de login
-	 */
-	public static final String PREF_LOGIN = "login";
-
-	/**
-	 * Préférence de password
-	 */
-	public static final String PREF_PWD = "password";
 
 	private static final String HEURE_SUFFIX = ":00";
 
@@ -116,9 +104,9 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 
 				// Affichage de la boite de dialogue pour le login / pwd
 				// Si les préférences ne sont pas déjà renseignées
-				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-				String login = settings.getString(PREF_LOGIN, "");
-				String password = settings.getString(PREF_PWD, "");
+				SharedPreferences settings = getSharedPreferences(MeteocielUtils.PREFS_NAME, 0);
+				String login = settings.getString(MeteocielUtils.PREF_LOGIN, "");
+				String password = settings.getString(MeteocielUtils.PREF_PWD, "");
 
 				if (login.isEmpty() || password.isEmpty()) {
 					// Boite de dialogue login
@@ -199,15 +187,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 						.findViewById(R.id.password);
 				reportObservation.setUser(login.getText().toString());
 				reportObservation.setPassword(password.getText().toString());
-
-				// Ajout dans les préférences
-				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putString(PREF_LOGIN, reportObservation.getUser());
-				editor.putString(PREF_PWD, reportObservation.getPassword());
-				// Commit the edits!
-				editor.commit();
-
+				
 				asyncTask = new EnvoiObservationTask();
 				asyncTask.execute(reportObservation);
 
@@ -390,42 +370,52 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 
 		@Override
 		protected Long doInBackground(ReportObservation... reportObservations) {
-			MeteocielUtils.soumettreFormulaireMeteociel(
-					ReportObservationActivity.this, reportObservations[0]);
+			try {
+				MeteocielUtils.soumettreFormulaireMeteociel(
+						ReportObservationActivity.this, reportObservations[0]);
+			} catch (SoumissionFormulaireException e) {
+				return new Long(1);
+			}
 			return new Long(0);
 		}
 
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
+			if (result == 1) {
+				showFormError();
+				dialogProgress.dismiss();
+			} else {
+				if (!this.isCancelled()) { // On n'a pas cancellé la tache sur
+											// une erreur
+					ReportObservationActivity.this
+							.runOnUiThread(new Runnable() {
 
-			if (!this.isCancelled()) { // On n'a pas cancellé la tache sur une erreur
-				ReportObservationActivity.this.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									dialogProgress.dismiss();
+									Toast toast = Toast.makeText(
+											ReportObservationActivity.this
+													.getApplicationContext(),
+											R.string.report_effectue, 1);
+									toast.setGravity(Gravity.CENTER, 0, 0);
+									toast.show();
 
-					@Override
-					public void run() {
-						dialogProgress.dismiss();
-						Toast toast = Toast.makeText(
-								ReportObservationActivity.this
-										.getApplicationContext(),
-								R.string.report_effectue, 1);
-						toast.setGravity(Gravity.CENTER, 0, 0);
-						toast.show();
+								}
+							});
+					ReportObservationActivity.this.finish();
+				} else {
+					ReportObservationActivity.this
+							.runOnUiThread(new Runnable() {
 
-					}
-				});
-				ReportObservationActivity.this.finish();
-			}else{
-				ReportObservationActivity.this.runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						dialogProgress.dismiss();
-					}
-				});
+								@Override
+								public void run() {
+									dialogProgress.dismiss();
+								}
+							});
+				}
 			}
 
-			
 		}
 	}
 
