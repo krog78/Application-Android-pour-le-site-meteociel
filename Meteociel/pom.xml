@@ -189,4 +189,7 @@ http://maven.apache.org/maven-v4_0_0.xsd">
 			</build>
 		</profile>
 	</profiles>
+	<scm>
+		<developerConnection>scm:git:[push=]https://krog78@github.com/krog78/Application-Android-pour-le-site-meteociel.git</developerConnection>
+	</scm>
 </project>
