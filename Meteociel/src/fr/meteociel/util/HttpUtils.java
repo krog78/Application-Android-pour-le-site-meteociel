@@ -298,8 +298,7 @@ public class HttpUtils {
 		try {
 			myFileUrl = new URL(fileUrl);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 		HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();

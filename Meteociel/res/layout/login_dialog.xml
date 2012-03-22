@@ -4,6 +4,8 @@
     android:orientation="horizontal"
     android:padding="10dp" >
 
+    <TextView android:text="@string/login" />
+
     <TableRow>
 
         <EditText
@@ -16,6 +18,8 @@
             <requestFocus />
         </EditText>
     </TableRow>
+
+    <TextView android:text="@string/password" />
 
     <TableRow>
 

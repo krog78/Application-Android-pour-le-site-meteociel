@@ -29,4 +29,6 @@
     <string name="metre">m</string>
     <string name="close">Fermer</string>
     <string name="erreur_soumission">Une erreur s\'est produite, vérifiez les données.</string>
+    <string name="login">Utilisateur:</string>
+    <string name="password">Mot de passe:</string>
 </resources>
