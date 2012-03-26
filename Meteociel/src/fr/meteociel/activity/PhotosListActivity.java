@@ -165,7 +165,7 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 						
 					try {
 						image.setImageBitmap(HttpUtils.downloadFile(listeObservations.get(
-								position).getUrlBigImage()));
+								position).getUrlBigImage(), PhotosListActivity.this));
 					} catch (IOException e) {
 						showConnectionError();
 					}

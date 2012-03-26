@@ -1,6 +1,7 @@
 package fr.meteociel.activity;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -231,11 +232,19 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 	 *            l'image sélectionnée
 	 */
 	private void setImageView(Uri selectedImage) {
-		InputStream imageStream;
+		InputStream imageStream = null;
 		try {
 			imageStream = getContentResolver().openInputStream(selectedImage);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
+		}finally{
+			if(imageStream != null){
+				try {
+					imageStream.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
 		ImageView v = (ImageView) findViewById(R.id.selectedImage);

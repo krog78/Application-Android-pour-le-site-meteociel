@@ -552,6 +552,8 @@ public class MeteocielUtils {
 						new InputSource(is)), result);
 			} catch (TransformerException e1) {
 				throw new RuntimeException(e1);
+			}finally{
+				is.close();
 			}
 
 		} catch (IOException e1) {

@@ -172,12 +172,19 @@ public class HttpUtils {
 
 		try {
 			HttpResponse response = httpClient.execute(httpPost, localContext);
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					response.getEntity().getContent()), BUFFER_SIZE);
-			StringBuilder htmlResponse = new StringBuilder();
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				htmlResponse.append(line);
+			InputStreamReader is = new InputStreamReader(
+					response.getEntity().getContent());
+			BufferedReader br = new BufferedReader(is, BUFFER_SIZE);
+			
+			try{
+				StringBuilder htmlResponse = new StringBuilder();
+				String line = "";
+				while ((line = br.readLine()) != null) {
+					htmlResponse.append(line);
+				}
+			}finally{
+				is.close();
+				br.close();				
 			}
 
 			// try {
@@ -228,11 +235,12 @@ public class HttpUtils {
 	 * @param params
 	 *            les paramètres à poster
 	 * @param httpPost
-	 * @throws SoumissionFormulaireException 
+	 * @throws SoumissionFormulaireException
 	 * 
 	 */
 	public static final void postRequest(AbstractMeteocielActivity activity,
-			String url, List<NameValuePair> params) throws SoumissionFormulaireException {
+			String url, List<NameValuePair> params)
+			throws SoumissionFormulaireException {
 
 		// DEBUT Proxy pour chez Atos
 		// HttpHost proxy = new HttpHost("80.78.6.10", 8080);
@@ -273,40 +281,35 @@ public class HttpUtils {
 
 		}
 	}
-	
+
 	/**
 	 * Méthode traitant le retour de la réponse http
-	 * @param response la réponse http
+	 * 
+	 * @param response
+	 *            la réponse http
 	 * @throws SoumissionFormulaireException
 	 */
-	private static final void traiterRetourRequete(String response) throws SoumissionFormulaireException{
-		if(response.toLowerCase().contains("incorrects") ||
-				response.toLowerCase().contains("probl")){
+	private static final void traiterRetourRequete(String response)
+			throws SoumissionFormulaireException {
+		if (response.toLowerCase().contains("incorrects")
+				|| response.toLowerCase().contains("probl")) {
 			throw new SoumissionFormulaireException();
-		}		
+		}
 	}
 
 	/**
 	 * Télécharge un fichier à l'url donnée
-	 * @param fileUrl l'url du fichier
+	 * 
+	 * @param fileUrl
+	 *            l'url du fichier
 	 * @return l'image au format Bitmap
 	 * @throws IOException
 	 */
-	public static final Bitmap downloadFile(String fileUrl) throws IOException {
+	public static final Bitmap downloadFile(String fileUrl, AbstractMeteocielActivity activity) throws IOException {
 
-		URL myFileUrl = null;
-		try {
-			myFileUrl = new URL(fileUrl);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-
-		HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
-		conn.setDoInput(true);
-		conn.connect();
-		InputStream is = conn.getInputStream();
-
-		return BitmapFactory.decodeStream(is);
+		ImageLoader img = new ImageLoader(activity.getApplicationContext());
+		img.setRequiredSize(200);
+		return img.getBitmap(fileUrl);
 
 	}
 

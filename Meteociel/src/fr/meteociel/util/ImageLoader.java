@@ -99,11 +99,12 @@ public class ImageLoader {
 				int scale = 1;
 				while (true) {
 					if (width_tmp / 2 < requiredSize
-							|| height_tmp / 2 < requiredSize)
+							//|| height_tmp / 2 < requiredSize
+							)
 						break;
 					width_tmp /= 2;
-					height_tmp /= 2;
-					scale *= 2;
+					//height_tmp /= 2;
+					scale++;
 				}
 
 				// decode with inSampleSize
