@@ -1,4 +1,4 @@
-package fr.meteociel.activity;
+package fr.meteo_ciel.activity;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import fr.meteociel.R;
+import fr.meteo_ciel.R;
 import fr.meteociel.exception.SoumissionFormulaireException;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.MeteocielUtils;

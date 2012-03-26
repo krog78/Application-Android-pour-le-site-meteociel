@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.meteociel.activity;
+package fr.meteo_ciel.activity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,17 +29,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import fr.meteociel.R;
+import fr.meteo_ciel.R;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
 import fr.meteociel.util.HttpUtils;
-import fr.meteociel.util.ImageLoader;
 import fr.meteociel.util.MeteocielUtils;
 
 /**
