@@ -19,7 +19,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
-import fr.meteo_ciel.R;
+import fr.meteo.meteociel.R;
 
 public class ImageLoader {
 

@@ -33,6 +33,7 @@
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<outputDirectory>bin</outputDirectory>
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
@@ -48,6 +49,7 @@
 					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
 					<sdk>
 						<platform>10</platform>
+						<path>/home/ippon/android-sdks</path>						
 					</sdk>
 					<deleteConflictingFiles>true</deleteConflictingFiles>
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
@@ -194,4 +196,5 @@
 	<scm>
 		<developerConnection>scm:git:[push=]https://krog78@github.com/krog78/Application-Android-pour-le-site-meteociel.git</developerConnection>
 	</scm>
+	
 </project>

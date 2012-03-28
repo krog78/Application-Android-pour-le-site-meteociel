@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    debuggable="false"
-    package="fr.meteo_ciel"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    package="fr.meteo.meteociel"
+    android:versionCode="2"
+    android:versionName="1.1">
 
-    <uses-sdk android:minSdkVersion="3" />
+    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="10"/>
 
     <application
         android:icon="@drawable/icon"

@@ -32,7 +32,7 @@ import org.apache.http.protocol.HttpContext;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import fr.meteo_ciel.activity.AbstractMeteocielActivity;
+import fr.meteo.meteociel.activity.AbstractMeteocielActivity;
 import fr.meteociel.exception.SoumissionFormulaireException;
 
 /**

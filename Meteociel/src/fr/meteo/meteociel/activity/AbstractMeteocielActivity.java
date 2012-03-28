@@ -1,4 +1,4 @@
-package fr.meteo_ciel.activity;
+package fr.meteo.meteociel.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import fr.meteo_ciel.R;
+import fr.meteo.meteociel.R;
 import fr.meteociel.om.ReportObservation;
 
 /**
