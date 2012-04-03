@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -62,6 +63,7 @@ public class ImageLoader {
 		Bitmap b = decodeFile(f);
 		if (b != null)
 			return b;
+		OutputStream os = null;
 
 		// from web
 		try {
@@ -73,14 +75,19 @@ public class ImageLoader {
 			conn.setReadTimeout(30000);
 			conn.setInstanceFollowRedirects(true);
 			InputStream is = conn.getInputStream();
-			OutputStream os = new FileOutputStream(f);
+			os = new FileOutputStream(f);
 			Utils.CopyStream(is, os);
-			os.close();
 			bitmap = decodeFile(f);
 			return bitmap;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		} finally {
+			try {
+				os.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
 		}
 	}
 
@@ -99,11 +106,11 @@ public class ImageLoader {
 				int scale = 1;
 				while (true) {
 					if (width_tmp / 2 < requiredSize
-							//|| height_tmp / 2 < requiredSize
-							)
+					// || height_tmp / 2 < requiredSize
+					)
 						break;
 					width_tmp /= 2;
-					//height_tmp /= 2;
+					// height_tmp /= 2;
 					scale++;
 				}
 
