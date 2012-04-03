@@ -18,19 +18,17 @@ package fr.meteo.meteociel.activity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
-
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +39,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
+
 import fr.meteo.meteociel.R;
+import fr.meteo.meteociel.alarm.ClearCacheAlarm;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
 import fr.meteociel.util.HttpUtils;
@@ -56,23 +60,53 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		setContentView(R.layout.main);
-		
-		// Create and setup the AdMob view
-	    AdRequest request = new AdRequest();
-	    request.addTestDevice(AdRequest.TEST_EMULATOR);
-	    
-	    AdView adView = new AdView(this, AdSize.BANNER, "a14f79b45f0ee9e"); // Put in your secret key here
-	    adView.loadAd(request);
-	    LinearLayout layout = (LinearLayout)findViewById(R.id.main);
-	    layout.addView(adView);
-	    
-		
 
-		
-		
+		// Lancement de la purge du cache
+		purgerCache();
+
+		// Fin lancement purge du cache
+
+		setContentView(R.layout.main);
+
+		// Create and setup the AdMob view
+		AdRequest request = new AdRequest();
+		request.addTestDevice(AdRequest.TEST_EMULATOR);
+
+		AdView adView = new AdView(this, AdSize.BANNER, "a14f79b45f0ee9e"); // Put
+																			// in
+																			// your
+																			// secret
+																			// key
+																			// here
+		adView.loadAd(request);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.main);
+		layout.addView(adView);
+
 		new AfficherObservationsTask().execute();
+
+	}
+
+	/**
+	 * Purge le cache 1 fois par jour à minuit
+	 */
+	private void purgerCache() {
+		// get a Calendar object with current time
+		Calendar cal = Calendar.getInstance();
+		// add 5 minutes to the calendar object
+		cal.set(Calendar.HOUR_OF_DAY, 24);
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		Intent intent = new Intent(this, ClearCacheAlarm.class);		
+		// In reality, you would want to have a static variable for the request
+		// code instead of 192837
+		PendingIntent sender = PendingIntent.getBroadcast(this, 192837, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
+		// Get the AlarmManager service
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.setRepeating(AlarmManager.ELAPSED_REALTIME, cal.getTimeInMillis(),
+				AlarmManager.INTERVAL_DAY, sender);
 
 	}
 
@@ -169,14 +203,14 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 		@Override
 		protected Long doInBackground(final Object... obj) {
 
-			final int position = (Integer)obj[0];
+			final int position = (Integer) obj[0];
 			final Bitmap bmp;
 			try {
-				bmp = HttpUtils.downloadFile(listeObservations.get(
-						position).getUrlBigImage(), PhotosListActivity.this);
+				bmp = HttpUtils.downloadFile(listeObservations.get(position)
+						.getUrlBigImage(), PhotosListActivity.this);
 			} catch (IOException e1) {
 				PhotosListActivity.this.runOnUiThread(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						showConnectionError();
@@ -184,22 +218,23 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 				});
 				return new Long(1);
 			}
-			
+
 			PhotosListActivity.this.runOnUiThread(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					// Chargement de l'image en grand dans un nouveau dialog
 					final Dialog dialog = new Dialog(PhotosListActivity.this);
-					
+
 					dialog.setContentView(R.layout.big_image);
 
-					ImageView image = (ImageView) dialog.findViewById(R.id.big_image);
-						
-					image.setImageBitmap(bmp);				
-					
-					
-					Button closeButton = (Button) dialog.findViewById(R.id.close);
+					ImageView image = (ImageView) dialog
+							.findViewById(R.id.big_image);
+
+					image.setImageBitmap(bmp);
+
+					Button closeButton = (Button) dialog
+							.findViewById(R.id.close);
 					closeButton.setOnClickListener(new View.OnClickListener() {
 
 						@Override
@@ -214,14 +249,13 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 
 					TextView description = (TextView) dialog
 							.findViewById(R.id.description);
-					description.setText(listeObservations.get(position).getTexte());
+					description.setText(listeObservations.get(position)
+							.getTexte());
 
 					dialog.show();
-					
+
 				}
 			});
-			
-			
 
 			return new Long(0);
 
@@ -230,7 +264,7 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 		@Override
 		protected void onPostExecute(Long result) {
 			super.onPostExecute(result);
-			
+
 			dialog.dismiss();
 		}
 	}
