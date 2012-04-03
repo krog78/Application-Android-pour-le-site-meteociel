@@ -20,11 +20,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +37,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import fr.meteo.meteociel.R;
@@ -49,8 +55,22 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.main);
+		
+		// Create and setup the AdMob view
+	    AdRequest request = new AdRequest();
+	    request.addTestDevice(AdRequest.TEST_EMULATOR);
+	    
+	    AdView adView = new AdView(this, AdSize.BANNER, "a14f79b45f0ee9e"); // Put in your secret key here
+	    adView.loadAd(request);
+	    LinearLayout layout = (LinearLayout)findViewById(R.id.main);
+	    layout.addView(adView);
+	    
+		
 
+		
+		
 		new AfficherObservationsTask().execute();
 
 	}
