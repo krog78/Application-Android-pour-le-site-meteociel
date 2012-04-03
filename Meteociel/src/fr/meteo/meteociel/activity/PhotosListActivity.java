@@ -27,6 +27,7 @@ import com.google.ads.AdView;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Layout;
@@ -168,25 +169,35 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 		@Override
 		protected Long doInBackground(final Object... obj) {
 
+			final int position = (Integer)obj[0];
+			final Bitmap bmp;
+			try {
+				bmp = HttpUtils.downloadFile(listeObservations.get(
+						position).getUrlBigImage(), PhotosListActivity.this);
+			} catch (IOException e1) {
+				PhotosListActivity.this.runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						showConnectionError();
+					}
+				});
+				return new Long(1);
+			}
+			
 			PhotosListActivity.this.runOnUiThread(new Runnable() {
 				
 				@Override
 				public void run() {
 					// Chargement de l'image en grand dans un nouveau dialog
 					final Dialog dialog = new Dialog(PhotosListActivity.this);
-
-					int position = (Integer)obj[0];
 					
 					dialog.setContentView(R.layout.big_image);
 
 					ImageView image = (ImageView) dialog.findViewById(R.id.big_image);
 						
-					try {
-						image.setImageBitmap(HttpUtils.downloadFile(listeObservations.get(
-								position).getUrlBigImage(), PhotosListActivity.this));
-					} catch (IOException e) {
-						showConnectionError();
-					}
+					image.setImageBitmap(bmp);				
+					
 					
 					Button closeButton = (Button) dialog.findViewById(R.id.close);
 					closeButton.setOnClickListener(new View.OnClickListener() {
