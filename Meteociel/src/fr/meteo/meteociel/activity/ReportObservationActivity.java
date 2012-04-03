@@ -235,6 +235,9 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 		InputStream imageStream = null;
 		try {
 			imageStream = getContentResolver().openInputStream(selectedImage);
+			Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
+			ImageView v = (ImageView) findViewById(R.id.selectedImage);
+			v.setImageBitmap(yourSelectedImage);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}finally{
@@ -246,9 +249,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 				}
 			}
 		}
-		Bitmap yourSelectedImage = BitmapFactory.decodeStream(imageStream);
-		ImageView v = (ImageView) findViewById(R.id.selectedImage);
-		v.setImageBitmap(yourSelectedImage);
+		
 	}
 
 	/**

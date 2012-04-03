@@ -38,7 +38,6 @@
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<outputDirectory>bin</outputDirectory>
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
