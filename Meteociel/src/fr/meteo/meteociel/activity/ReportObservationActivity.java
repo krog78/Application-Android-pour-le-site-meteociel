@@ -327,7 +327,9 @@ public class ReportObservationActivity extends AbstractMeteocielActivity
 							.findViewById(R.id.altitude);
 					reportObservation.getLieu().setAltitude(
 							altitude.getText().toString());
-
+					CheckedTextView vLieu = (CheckedTextView) findViewById(R.id.lieuObservation);
+					vLieu.setText(getString(R.string.lieu_observation) + " "
+							+ ville.getText().toString());
 					alerteLieu.cancel();
 				}
 			});
