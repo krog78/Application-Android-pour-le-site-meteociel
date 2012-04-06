@@ -27,7 +27,7 @@ public class ReportObservation implements IReportObservation{
 	/**
 	 * Lieu de l'observation
 	 */
-	private Lieu lieu = new Lieu();
+	private Lieu lieu = new Lieu("","");
 	
 	/**
 	 * Heure de l'observation

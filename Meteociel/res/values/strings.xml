@@ -15,6 +15,7 @@
     <string name="changer_heure">Changer l\'heure</string>  
     <string name="choix_heure">Choisissez une heure:</string>
     <string name="heure_observation">Heure de l\'observation:</string>
+    <string name="lieu_observation">Lieu de l\'observation:</string>
     <string name="erreur_connexion">Veuillez activer le transfert de données.</string>
     <string name="chargement">Chargement en cours&#8230;</string>
     <string name="envoi">Envoi en cours&#8230;</string>
@@ -31,4 +32,7 @@
     <string name="erreur_soumission">Une erreur s\'est produite, vérifiez les données.</string>
     <string name="login">Utilisateur:</string>
     <string name="password">Mot de passe:</string>
+    <string name="position_courante">Ma position</string>
+    <string name="msg_geolocalisation">Vérifiez que la localisation réseau ou GPS est activée</string>
+    <string name="recherche_localisation">Localisation en cours...</string>
 </resources>

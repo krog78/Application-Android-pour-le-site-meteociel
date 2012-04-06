@@ -10,5 +10,9 @@
         android:id="@+id/change_date"
         android:icon="@drawable/ic_dialog_time"
         android:title="@string/changer_heure"/>
+        <item
+        android:id="@+id/location_courante"
+        android:icon="@drawable/ic_menu_myplaces"
+        android:title="@string/position_courante"/>
 
 </menu>

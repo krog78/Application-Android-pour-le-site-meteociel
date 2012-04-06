@@ -11,6 +11,12 @@ public class Lieu {
 	 */
 	private String ville = "";
 	
+	public Lieu(String ville, String altitude) {
+		super();
+		this.ville = ville;
+		this.altitude = altitude;
+	}
+
 	/**
 	 * Altitude de l'observation
 	 */

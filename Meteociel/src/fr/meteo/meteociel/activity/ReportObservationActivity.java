@@ -17,6 +17,10 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -35,7 +39,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.meteo.meteociel.R;
+import fr.meteo.meteociel.location.MyLocation;
+import fr.meteo.meteociel.location.MyLocation.LocationResult;
 import fr.meteociel.exception.SoumissionFormulaireException;
+import fr.meteociel.om.Lieu;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.MeteocielUtils;
 
@@ -45,14 +52,15 @@ import fr.meteociel.util.MeteocielUtils;
  * @author A512568
  * 
  */
-public class ReportObservationActivity extends AbstractMeteocielActivity {
-
-
+public class ReportObservationActivity extends AbstractMeteocielActivity
+		implements LocationListener {
 
 	private static final String HEURE_SUFFIX = ":00";
 
 	private static final int SELECT_PHOTO = 100;
 
+	private ProgressDialog dialogProgress;
+	
 	/**
 	 * Compteur utilisé pour savoir si on est à l'initialisation ou à la
 	 * sélection dans le spinner du type de l'observation
@@ -105,9 +113,12 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 
 				// Affichage de la boite de dialogue pour le login / pwd
 				// Si les préférences ne sont pas déjà renseignées
-				SharedPreferences settings = getSharedPreferences(MeteocielUtils.PREFS_NAME, 0);
-				String login = settings.getString(MeteocielUtils.PREF_LOGIN, "");
-				String password = settings.getString(MeteocielUtils.PREF_PWD, "");
+				SharedPreferences settings = getSharedPreferences(
+						MeteocielUtils.PREFS_NAME, 0);
+				String login = settings
+						.getString(MeteocielUtils.PREF_LOGIN, "");
+				String password = settings.getString(MeteocielUtils.PREF_PWD,
+						"");
 
 				if (login.isEmpty() || password.isEmpty()) {
 					// Boite de dialogue login
@@ -188,7 +199,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 						.findViewById(R.id.password);
 				reportObservation.setUser(login.getText().toString());
 				reportObservation.setPassword(password.getText().toString());
-				
+
 				asyncTask = new EnvoiObservationTask();
 				asyncTask.execute(reportObservation);
 
@@ -240,8 +251,8 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 			v.setImageBitmap(yourSelectedImage);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
-		}finally{
-			if(imageStream != null){
+		} finally {
+			if (imageStream != null) {
 				try {
 					imageStream.close();
 				} catch (IOException e) {
@@ -249,7 +260,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 				}
 			}
 		}
-		
+
 	}
 
 	/**
@@ -346,10 +357,38 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 			AlertDialog alert = builder.create();
 			alert.show();
 			return true;
+		case R.id.location_courante: // Geolocalisation
+
+			dialogProgress = ProgressDialog.show(
+					ReportObservationActivity.this, "",
+					getString(R.string.recherche_localisation), true);
+			
+			MyLocation myLocation = new MyLocation();
+
+			myLocation.getLocation(this, locationResult);
+
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
+	public LocationResult locationResult = new LocationResult() {
+		@Override
+		public void gotLocation(final Location location) {
+			dialogProgress.dismiss();
+			if (location != null) {
+				Address address = recupererAdresse(location);
+				reportObservation.setLieu(new Lieu(address.getLocality(), "0"));
+				CheckedTextView v = (CheckedTextView) findViewById(R.id.lieuObservation);
+				v.setText(getString(R.string.lieu_observation) + " "
+						+ address.getLocality());
+			} else {
+				Toast.makeText(ReportObservationActivity.this,
+						getString(R.string.msg_geolocalisation), 2);
+			}
+		}
+	};
 
 	/**
 	 * Tache permettant d'envoyer le report en arrière plan.
@@ -448,6 +487,59 @@ public class ReportObservationActivity extends AbstractMeteocielActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
+	}
+
+	/**
+	 * Récupère une adresse à partir d'une location
+	 * 
+	 * @return l'adresse
+	 */
+	private Address recupererAdresse(Location location) {
+
+		// Le geocoder permet de récupérer ou chercher des adresses
+		// gràce à un mot clé ou une position
+		Geocoder geo = new Geocoder(this);
+		try {
+			// Ici on récupère la premiere adresse trouvé gràce à la position
+			// que l'on a récupéré
+			List<Address> adresses = geo.getFromLocation(
+					location.getLatitude(), location.getLongitude(), 1);
+
+			if (adresses != null && adresses.size() == 1) {
+				Address adresse = adresses.get(0);
+				return adresse;
+			} else {
+				// sinon on affiche un message d'erreur
+				return null;
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

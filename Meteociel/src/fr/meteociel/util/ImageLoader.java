@@ -56,7 +56,7 @@ public class ImageLoader {
 		executorService.submit(new PhotosLoader(p));
 	}
 
-	public Bitmap getBitmap(String url) {
+	public Bitmap getBitmap(String url) throws IOException{
 		File f = fileCache.getFile(url);
 
 		// from SD cache
@@ -71,19 +71,18 @@ public class ImageLoader {
 			URL imageUrl = new URL(url);
 			HttpURLConnection conn = (HttpURLConnection) imageUrl
 					.openConnection();
-			conn.setConnectTimeout(30000);
-			conn.setReadTimeout(30000);
+			conn.setConnectTimeout(60000);
+			conn.setReadTimeout(60000);
 			conn.setInstanceFollowRedirects(true);
 			InputStream is = conn.getInputStream();
 			os = new FileOutputStream(f);
 			Utils.CopyStream(is, os);
 			bitmap = decodeFile(f);
 			return bitmap;
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
 		} finally {
 			try {
-				os.close();
+				if (os != null)
+					os.close();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -151,7 +150,12 @@ public class ImageLoader {
 		public void run() {
 			if (imageViewReused(photoToLoad))
 				return;
-			Bitmap bmp = getBitmap(photoToLoad.url);
+			Bitmap bmp;
+			try {
+				bmp = getBitmap(photoToLoad.url);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			memoryCache.put(photoToLoad.url, bmp);
 			if (imageViewReused(photoToLoad))
 				return;
