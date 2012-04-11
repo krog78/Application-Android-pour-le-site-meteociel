@@ -386,8 +386,17 @@ public class ReportObservationActivity extends AbstractMeteocielActivity
 				v.setText(getString(R.string.lieu_observation) + " "
 						+ address.getLocality());
 			} else {
-				Toast.makeText(ReportObservationActivity.this,
-						getString(R.string.msg_geolocalisation), 2);
+				ReportObservationActivity.this.runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
+								getString(R.string.msg_geolocalisation), 10);
+						toast.show();
+						
+					}
+				});
+				
 			}
 		}
 	};

@@ -33,6 +33,6 @@
     <string name="login">Utilisateur:</string>
     <string name="password">Mot de passe:</string>
     <string name="position_courante">Ma position</string>
-    <string name="msg_geolocalisation">Vérifiez que la localisation réseau ou GPS est activée</string>
+    <string name="msg_geolocalisation">Impossible de vous localiser. Vérifiez que la localisation réseau ou GPS est activée.</string>
     <string name="recherche_localisation">Localisation en cours...</string>
 </resources>
