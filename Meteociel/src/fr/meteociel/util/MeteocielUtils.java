@@ -139,7 +139,7 @@ public class MeteocielUtils {
 		}
 		
 		params.add(new BasicNameValuePair("Commentaire", reportObservation
-				.getTexte()));
+				.getTexte() + "\n\n"+activity.getString(R.string.rapport_android)));
 		params.add(new BasicNameValuePair("RadioGroup", reportObservation
 				.getValue()));
 
