@@ -462,8 +462,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity
 									toast.show();
 
 								}
-							});
-					ReportObservationActivity.this.finish();
+							});					
 				} else {
 					ReportObservationActivity.this
 							.runOnUiThread(new Runnable() {
