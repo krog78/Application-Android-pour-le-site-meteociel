@@ -36,4 +36,6 @@
     <string name="msg_geolocalisation">Impossible de vous localiser. Vérifiez que la localisation réseau ou GPS est activée.</string>
     <string name="recherche_localisation">Localisation en cours &#8230;</string>
     <string name="rapport_android">Android Meteociel Photo Uploader</string>
+    <string name="tab_liste_observations">Observations</string>
+    <string name="tab_report_observation">Report</string>
 </resources>

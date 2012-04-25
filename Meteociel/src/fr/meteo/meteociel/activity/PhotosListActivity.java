@@ -26,6 +26,7 @@ import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.google.ads.AdRequest;
@@ -60,13 +62,13 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		// Lancement de la purge du cache
 		purgerCache();
 
 		// Fin lancement purge du cache
 
-		setContentView(R.layout.main);
+		setContentView(R.layout.liste_observations);
 
 		// Create and setup the AdMob view
 		AdRequest request = new AdRequest();
