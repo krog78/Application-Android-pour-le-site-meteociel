@@ -26,7 +26,6 @@ import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,7 +38,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.google.ads.AdRequest;
@@ -47,7 +45,6 @@ import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
 import fr.meteo.meteociel.R;
-import fr.meteo.meteociel.alarm.ClearCacheAlarm;
 import fr.meteociel.adapter.LazyAdapter;
 import fr.meteociel.om.Observation;
 import fr.meteociel.util.HttpUtils;
@@ -62,13 +59,13 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// Lancement de la purge du cache
-		purgerCache();
+		//purgerCache();
 
 		// Fin lancement purge du cache
 
-		setContentView(R.layout.liste_observations);
+		setContentView(R.layout.main);
 
 		// Create and setup the AdMob view
 		AdRequest request = new AdRequest();
@@ -89,28 +86,28 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 	}
 
 	/**
-	 * Purge le cache 1 fois par jour Ã  minuit
+	 * Purge le cache 1 fois par jour à minuit
 	 */
-	private void purgerCache() {
-		// get a Calendar object with current time
-		Calendar cal = Calendar.getInstance();
-		// add 5 minutes to the calendar object
-		cal.set(Calendar.HOUR_OF_DAY, 24);
-		cal.set(Calendar.HOUR, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		Intent intent = new Intent(this, ClearCacheAlarm.class);		
-		// In reality, you would want to have a static variable for the request
-		// code instead of 192837
-		PendingIntent sender = PendingIntent.getBroadcast(this, 192837, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-
-		// Get the AlarmManager service
-		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-		am.setRepeating(AlarmManager.ELAPSED_REALTIME, cal.getTimeInMillis(),
-				AlarmManager.INTERVAL_DAY, sender);
-
-	}
+//	private void purgerCache() {
+//		// get a Calendar object with current time
+//		Calendar cal = Calendar.getInstance();
+//		// add 5 minutes to the calendar object
+//		cal.set(Calendar.HOUR_OF_DAY, 24);
+//		cal.set(Calendar.HOUR, 0);
+//		cal.set(Calendar.MINUTE, 0);
+//		cal.set(Calendar.SECOND, 0);
+//		Intent intent = new Intent(this, ClearCacheAlarm.class);		
+//		// In reality, you would want to have a static variable for the request
+//		// code instead of 192837
+//		PendingIntent sender = PendingIntent.getBroadcast(this, 192837, intent,
+//				PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//		// Get the AlarmManager service
+//		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+//		am.setRepeating(AlarmManager.ELAPSED_REALTIME, cal.getTimeInMillis(),
+//				AlarmManager.INTERVAL_DAY, sender);
+//
+//	}
 
 	@Override
 	public void onDestroy() {
@@ -245,7 +242,7 @@ public class PhotosListActivity extends AbstractMeteocielActivity {
 						}
 					});
 
-					// LibellÃ© de l'image
+					// Libellé de l'image
 					TextView titre = (TextView) dialog.findViewById(R.id.titre);
 					titre.setText(listeObservations.get(position).getTitre());
 

@@ -39,10 +39,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.meteo.meteociel.R;
-import fr.meteo.meteociel.location.MyLocation;
-import fr.meteo.meteociel.location.MyLocation.LocationResult;
 import fr.meteociel.exception.SoumissionFormulaireException;
-import fr.meteociel.om.Lieu;
 import fr.meteociel.om.ReportObservation;
 import fr.meteociel.util.MeteocielUtils;
 
@@ -359,47 +356,47 @@ public class ReportObservationActivity extends AbstractMeteocielActivity
 			AlertDialog alert = builder.create();
 			alert.show();
 			return true;
-		case R.id.location_courante: // Geolocalisation
-
-			dialogProgress = ProgressDialog.show(
-					ReportObservationActivity.this, "",
-					getString(R.string.recherche_localisation), true);
-			
-			MyLocation myLocation = new MyLocation();
-
-			myLocation.getLocation(this, locationResult);
-
-			return true;
+//		case R.id.location_courante: // Geolocalisation
+//
+//			dialogProgress = ProgressDialog.show(
+//					ReportObservationActivity.this, "",
+//					getString(R.string.recherche_localisation), true);
+//			
+//			MyLocation myLocation = new MyLocation();
+//
+//			myLocation.getLocation(this, locationResult);
+//
+//			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	public LocationResult locationResult = new LocationResult() {
-		@Override
-		public void gotLocation(final Location location) {
-			dialogProgress.dismiss();
-			if (location != null) {
-				Address address = recupererAdresse(location);
-				reportObservation.setLieu(new Lieu(address.getLocality(), "0"));
-				CheckedTextView v = (CheckedTextView) findViewById(R.id.lieuObservation);
-				v.setText(getString(R.string.lieu_observation) + " "
-						+ address.getLocality());
-			} else {
-				ReportObservationActivity.this.runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-						Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
-								getString(R.string.msg_geolocalisation), 10);
-						toast.show();
-						
-					}
-				});
-				
-			}
-		}
-	};
+//	public LocationResult locationResult = new LocationResult() {
+//		@Override
+//		public void gotLocation(final Location location) {
+//			dialogProgress.dismiss();
+//			if (location != null) {
+//				Address address = recupererAdresse(location);
+//				reportObservation.setLieu(new Lieu(address.getLocality(), "0"));
+//				CheckedTextView v = (CheckedTextView) findViewById(R.id.lieuObservation);
+//				v.setText(getString(R.string.lieu_observation) + " "
+//						+ address.getLocality());
+//			} else {
+//				ReportObservationActivity.this.runOnUiThread(new Runnable() {
+//					
+//					@Override
+//					public void run() {
+//						Toast toast = Toast.makeText(ReportObservationActivity.this.getApplicationContext(),
+//								getString(R.string.msg_geolocalisation), 10);
+//						toast.show();
+//						
+//					}
+//				});
+//				
+//			}
+//		}
+//	};
 
 	/**
 	 * Tache permettant d'envoyer le report en arrière plan.
