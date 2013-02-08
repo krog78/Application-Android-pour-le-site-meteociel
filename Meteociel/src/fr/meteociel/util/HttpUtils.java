@@ -1,14 +1,12 @@
 package fr.meteociel.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -31,7 +29,6 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import fr.meteo.meteociel.activity.AbstractMeteocielActivity;
 import fr.meteociel.exception.SoumissionFormulaireException;
 
@@ -46,7 +43,7 @@ public class HttpUtils {
 	/**
 	 * Timeout de soumission du formulaire à meteociel
 	 */
-	private static final int TIMEOUT_MS = 10000;
+	private static final int TIMEOUT_MS = 20000;
 
 	/**
 	 * Taille du buffer de récupération de la réponse après soumission du
@@ -171,35 +168,8 @@ public class HttpUtils {
 		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
 
 		try {
-			HttpResponse response = httpClient.execute(httpPost, localContext);
-			InputStreamReader is = new InputStreamReader(
-					response.getEntity().getContent());
-			BufferedReader br = new BufferedReader(is, BUFFER_SIZE);
-			
-			try{
-				StringBuilder htmlResponse = new StringBuilder();
-				String line = "";
-				while ((line = br.readLine()) != null) {
-					htmlResponse.append(line);
-				}
-			}finally{
-				is.close();
-				br.close();				
-			}
-
-			// try {
-			// File c = new File("/sdcard/test.html");
-			//
-			// BufferedWriter out = new BufferedWriter(new FileWriter(c));
-			// out.write(htmlResponse.toString());
-			// out.close();
-			// } catch (IOException e) {
-			// throw new RuntimeException(e);
-			// }
-
-		} catch (ClientProtocolException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
+			postRequest(url, params);
+		} catch (SoumissionFormulaireException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -238,8 +208,7 @@ public class HttpUtils {
 	 * @throws SoumissionFormulaireException
 	 * 
 	 */
-	public static final void postRequest(AbstractMeteocielActivity activity,
-			String url, List<NameValuePair> params)
+	public static final void postRequest(String url, List<NameValuePair> params)
 			throws SoumissionFormulaireException {
 
 		// DEBUT Proxy pour chez Atos
@@ -262,23 +231,11 @@ public class HttpUtils {
 		try {
 			HttpResponse response = httpClient.execute(httpPost, localContext);
 			traiterRetourRequete(httpResponseToString(response));
-			// try {
-			// File c = new File("/sdcard/test.html");
-			//
-			// BufferedWriter out = new BufferedWriter(new FileWriter(c));
-			// out.write(httpResponseToString(response));
-			// out.close();
-			// } catch (IOException e) {
-			// throw new RuntimeException(e);
-			// }
 
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
-			if (activity.getAsyncTask() != null)
-				activity.getAsyncTask().cancel(true);
-			activity.showConnectionError();
-
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -293,7 +250,16 @@ public class HttpUtils {
 			throws SoumissionFormulaireException {
 		if (response.toLowerCase().contains("incorrects")
 				|| response.toLowerCase().contains("probl")) {
-			throw new SoumissionFormulaireException();
+
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter(
+						"/mnt/sdcard/temp/MeteocielError.html"));
+				out.write(response);
+				out.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			throw new SoumissionFormulaireException(response);
 		}
 	}
 
@@ -305,7 +271,8 @@ public class HttpUtils {
 	 * @return l'image au format Bitmap
 	 * @throws IOException
 	 */
-	public static final Bitmap downloadFile(String fileUrl, AbstractMeteocielActivity activity) throws IOException {
+	public static final Bitmap downloadFile(String fileUrl,
+			AbstractMeteocielActivity activity) throws IOException {
 
 		ImageLoader img = new ImageLoader(activity.getApplicationContext());
 		img.setRequiredSize(200);

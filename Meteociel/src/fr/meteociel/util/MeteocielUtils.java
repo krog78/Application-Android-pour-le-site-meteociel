@@ -181,7 +181,7 @@ public class MeteocielUtils {
 					getImageIdMeteociel(activity)));
 		}
 
-		HttpUtils.postRequest(activity, url, params);
+		HttpUtils.postRequest(url, params);
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class MeteocielUtils {
 
 			// Ajout des paramètres
 			HttpUtils.uploadImageRequest(url, new ArrayList<NameValuePair>(),
-					reportObservation.getPathImage());
+					reportObservation.getPathImage());			
 		}
 	}
 
@@ -234,7 +234,7 @@ public class MeteocielUtils {
 				.getPassword()));
 		params.add(new BasicNameValuePair("expire", "on"));
 
-		HttpUtils.postRequest(activity, url, params);
+		HttpUtils.postRequest(url, params);
 		
 		// Ajout dans les préférences
 		SharedPreferences settings = activity.getSharedPreferences(PREFS_NAME, 0);

@@ -12,4 +12,8 @@ public class SoumissionFormulaireException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public SoumissionFormulaireException(String response) {
+		super(response);		
+	}
+	
 }

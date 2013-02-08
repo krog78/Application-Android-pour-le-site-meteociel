@@ -199,7 +199,7 @@ public class ReportObservationActivity extends AbstractMeteocielActivity
 
 				asyncTask = new EnvoiObservationTask();
 				asyncTask.execute(reportObservation);
-
+				dialog.dismiss();
 			}
 		});
 
