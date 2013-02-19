@@ -117,8 +117,17 @@ public class MeteocielUtils {
 	public static final void soumettreFormulaireMeteociel(AbstractMeteocielActivity activity,
 			ReportObservation reportObservation) throws SoumissionFormulaireException {
 
+		
 		loginMeteociel(activity, reportObservation);
 
+		while(!checkUserLogged(activity, reportObservation)){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
 		soumettreImageMeteociel(reportObservation);
 
 		String url = "http://meteociel.fr/temps-reel/observation_valide.php";
@@ -200,7 +209,23 @@ public class MeteocielUtils {
 					reportObservation.getPathImage());			
 		}
 	}
-
+	
+	/**
+	 * Vérification que l'utilisateur est bien loggué
+	 */
+	private static final boolean checkUserLogged(AbstractMeteocielActivity activity, ReportObservation reportObservation) {
+		String url = "http://meteociel.fr/user/control.php";
+		
+		HttpResponse response = HttpUtils.getRequest(activity, url);
+		String html = HttpUtils.httpResponseToString(response);
+				
+		if(html.contains("Bienvenue sur votre espace personnel")){
+			return true;
+		}else{
+			return false;
+		}
+	}	
+		
 	/**
 	 * Méthode de récupération du dernier image id posté
 	 */

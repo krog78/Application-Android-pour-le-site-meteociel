@@ -39,7 +39,6 @@ import fr.meteociel.exception.SoumissionFormulaireException;
  * 
  */
 public class HttpUtils {
-
 	/**
 	 * Timeout de soumission du formulaire à meteociel
 	 */
@@ -168,8 +167,25 @@ public class HttpUtils {
 		HttpConnectionParams.setSoTimeout(httpClient.getParams(), TIMEOUT_MS);
 
 		try {
-			postRequest(url, params);
-		} catch (SoumissionFormulaireException e) {
+			HttpResponse response = httpClient.execute(httpPost, localContext);
+			InputStreamReader is = new InputStreamReader(
+					response.getEntity().getContent());
+			BufferedReader br = new BufferedReader(is, BUFFER_SIZE);
+			
+			try{
+				StringBuilder htmlResponse = new StringBuilder();
+				String line = "";
+				while ((line = br.readLine()) != null) {
+					htmlResponse.append(line);
+				}
+			}finally{
+				is.close();
+				br.close();				
+			}			
+
+		} catch (ClientProtocolException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -229,6 +245,7 @@ public class HttpUtils {
 		}
 
 		try {
+			
 			HttpResponse response = httpClient.execute(httpPost, localContext);
 			traiterRetourRequete(httpResponseToString(response));
 
@@ -248,18 +265,19 @@ public class HttpUtils {
 	 */
 	private static final void traiterRetourRequete(String response)
 			throws SoumissionFormulaireException {
+		
 		if (response.toLowerCase().contains("incorrects")
 				|| response.toLowerCase().contains("probl")) {
 
-			try {
-				BufferedWriter out = new BufferedWriter(new FileWriter(
-						"/mnt/sdcard/temp/MeteocielError.html"));
-				out.write(response);
-				out.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			throw new SoumissionFormulaireException(response);
+//			try {
+//				BufferedWriter out = new BufferedWriter(new FileWriter(
+//						"/mnt/sdcard/temp/MeteocielError.html"));
+//				out.write(response);
+//				out.close();
+//			} catch (IOException e) {
+//				throw new RuntimeException(e);
+//			}
+			throw new SoumissionFormulaireException();
 		}
 	}
 

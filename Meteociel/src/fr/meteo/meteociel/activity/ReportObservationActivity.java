@@ -196,10 +196,10 @@ public class ReportObservationActivity extends AbstractMeteocielActivity
 						.findViewById(R.id.password);
 				reportObservation.setUser(login.getText().toString());
 				reportObservation.setPassword(password.getText().toString());
-
+				dialog.dismiss();
 				asyncTask = new EnvoiObservationTask();
 				asyncTask.execute(reportObservation);
-				dialog.dismiss();
+				
 			}
 		});
 
